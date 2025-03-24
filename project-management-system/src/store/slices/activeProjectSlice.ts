@@ -16,8 +16,11 @@ export const activeProjectSlice = createSlice({
     setActiveProject: (state, action: PayloadAction<string>) => {
       state.activeProjectId = action.payload;
     },
+    clearActiveProject: (state) => {
+      state.activeProjectId = null;
+    },
   },
 });
 
-export const { setActiveProject } = activeProjectSlice.actions;
+export const { setActiveProject, clearActiveProject } = activeProjectSlice.actions;
 export default activeProjectSlice.reducer;

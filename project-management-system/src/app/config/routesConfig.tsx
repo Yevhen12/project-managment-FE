@@ -5,12 +5,14 @@ import NotFoundPage from '../..//pages/notFound';
 import RegisterPage from '../../pages/register';
 import DashboardPage from '../../pages/dashboard';
 import SelectProjectPage from '../../pages/selectProject';
+import ProfilePage from '../../pages/profile';
+import InvitesPage from '../../pages/invites';
 
 export const routeConfig: Record<AppRoutes, RouteAppProps> = {
   [AppRoutes.MAIN]: {
     path: RoutePath.main,
     element: <SelectProjectPage />,
-    authOnly: true, // або false, якщо не потрібна авторизація
+    authOnly: false,
   },
   [AppRoutes.LOGIN]: {
     path: RoutePath.login,
@@ -23,13 +25,23 @@ export const routeConfig: Record<AppRoutes, RouteAppProps> = {
     authOnly: false,
   },
   [AppRoutes.DASHBOARD]: {
-    path: `${RoutePath.dashboard}/:projectId`,
+    path: RoutePath.dashboard,
     element: <DashboardPage />,
+    authOnly: true,
+  },
+  [AppRoutes.PROFILE]: {
+    path: RoutePath.profile,
+    element: <ProfilePage />,
+    authOnly: true,
+  },
+  [AppRoutes.INVITES]: {
+    path: RoutePath.invites,
+    element: <InvitesPage />,
     authOnly: true,
   },
   [AppRoutes.NOT_FOUND]: {
     path: RoutePath.not_found,
     element: <NotFoundPage />,
     authOnly: false,
-  }
-};
+  },
+}
