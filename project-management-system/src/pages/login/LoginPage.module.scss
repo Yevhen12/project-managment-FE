@@ -1,0 +1,42 @@
+@import '../../styles/variables.scss';
+
+.wrapper {
+  height: 100vh;
+  background: linear-gradient(135deg, #f4f5f7, #e1e4e8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.container {
+  width: 420px;
+  padding: 40px 32px;
+  border-radius: 16px;
+  background-color: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.logoWrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.logo {
+  height: 40px;
+  object-fit: contain;
+}
+
+.form {
+  margin-top: 12px;
+}
+
+.loginButton {
+  background-color: $primary-color !important;
+  color: white;
+
+  &:hover {
+    background-color: darken($primary-color, 10%) !important;
+  }
+}
+
