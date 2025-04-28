@@ -7,6 +7,8 @@ import DashboardPage from '../../pages/dashboard';
 import SelectProjectPage from '../../pages/selectProject';
 import ProfilePage from '../../pages/profile';
 import InvitesPage from '../../pages/invites';
+import TasksPage from '../../pages/tasks';
+import TaskDetailsPage from '../../pages/taskDetails';
 
 export const routeConfig: Record<AppRoutes, RouteAppProps> = {
   [AppRoutes.MAIN]: {
@@ -27,6 +29,16 @@ export const routeConfig: Record<AppRoutes, RouteAppProps> = {
   [AppRoutes.DASHBOARD]: {
     path: RoutePath.dashboard,
     element: <DashboardPage />,
+    authOnly: true,
+  },
+  [AppRoutes.TASKS]: {
+    path: RoutePath.tasks,
+    element: <TasksPage />,
+    authOnly: true,
+  },
+  [AppRoutes.TASK_DETAILS]: {
+    path: RoutePath.task_details,
+    element: <TaskDetailsPage />,
     authOnly: true,
   },
   [AppRoutes.PROFILE]: {

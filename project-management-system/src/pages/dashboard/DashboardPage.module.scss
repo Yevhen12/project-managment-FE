@@ -1,17 +1,96 @@
-// styles/dashboard.module.scss
-.dashboard {
+
+
+.title {
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.subheading {
+  margin-bottom: 20px;
+}
+
+.subtitle {
+  color: #6b7280;
+  margin-bottom: 1rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+.card {
+  background: white;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
   display: flex;
   flex-direction: column;
-  height: 100vh;
 }
 
-.main {
+.wide {
+  grid-column: span 2;
+}
+
+.wideGraph {
+  grid-column: span 3;
+}
+
+.progressBar {
+  background: #e5e7eb;
+  border-radius: 6px;
+  height: 8px;
+  margin-top: 4px;
+
+  .progress {
+    height: 100%;
+    background: #3b82f6;
+    border-radius: 6px;
+  }
+}
+
+.tasks li,
+.deadlines li {
   display: flex;
-  flex: 1;
+  flex-direction: column;
+  margin-bottom: 0.5rem;
 }
 
-.content {
-  flex: 1;
-  padding: 24px;
-  background-color: #f5f5f5;
+.status {
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  width: fit-content;
+  margin-top: 2px;
+
+  &.inProgress {
+    background-color: #facc15;
+  }
+
+  &.todo {
+    background-color: #cbd5e1;
+  }
+
+  &.done {
+    background-color: #4ade80;
+  }
+}
+
+.priority, .sprint {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.links li {
+  padding: 4px 0;
+  font-weight: 500;
+}
+
+.viewAll {
+  font-size: 12px;
+  margin-top: 0.5rem;
+  color: #3b82f6;
+  align-self: flex-end;
+  cursor: pointer;
 }

@@ -1,0 +1,155 @@
+.taskRow {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: #fff;
+  padding: 12px 18px;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  font-size: 14px;
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.2s ease;
+
+  &:hover {
+    background: #f5f7fa;
+  }
+}
+
+.idSection {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 140px;
+}
+
+.typeBadge {
+  width: 24px;
+  height: 24px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  background-color: #eee;
+}
+
+.typeBadge.bug {
+  background-color: #f8d7da;
+}
+
+.typeBadge.story {
+  background-color: #d1ecf1;
+}
+
+.typeBadge.epic {
+  background-color: #d4edda;
+}
+
+.taskId {
+  font-weight: 600;
+  color: #1976d2;
+}
+
+.titleSection {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+
+  .title {
+    font-weight: 600;
+  }
+
+  .subtitle {
+    font-size: 12px;
+    color: #888;
+  }
+}
+
+.epicText {
+  font-size: 12px;
+  min-width: 100px;
+  color: #555;
+}
+
+.status {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 12px;
+  text-align: center;
+  min-width: 90px;
+  text-transform: uppercase;
+}
+
+.status.todo {
+  background-color: #e0e0e0;
+  color: #555;
+}
+
+.status.qaready {
+  background-color: #c8e6c9;
+  color: #256029;
+}
+
+.status.codereview {
+  background-color: #bbdefb;
+  color: #0d47a1;
+}
+
+.estimate {
+  font-size: 12px;
+  color: #888;
+  min-width: 40px;
+  text-align: center;
+}
+
+.assigneeBlock {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.assignee {
+  background: #f1f1f1;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #555;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.priorityHigh {
+  color: red;
+  font-size: 16px;
+}
+
+.priorityMedium {
+  color: orange;
+  font-size: 16px;
+}
+
+.priorityLow {
+  color: blue;
+  font-size: 16px;
+}
+.priorityBlockerWrapper {
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  background-color: red;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  .priorityBlocker {
+    color: white;
+    font-weight: bold;
+    font-size: 16px;
+    margin-bottom: 2px;
+  }
+}
+

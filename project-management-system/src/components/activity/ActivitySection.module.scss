@@ -1,0 +1,146 @@
+.activity {
+  margin-top: 20px;
+}
+
+.tabs {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #ddd;
+  
+  button {
+    background: none;
+    border: none;
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #555;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-bottom: 3px solid transparent;
+
+    &:hover {
+      background-color: #f5f5f5;
+      color: #1976d2;
+      border-radius: 8px 8px 0 0;
+    }
+
+    &.active {
+      color: #1976d2;
+      font-weight: 600;
+      border-bottom: 3px solid #1976d2;
+    }
+  }
+}
+
+
+.activeTab {
+  background: #1976d2;
+  color: white;
+}
+
+.tabContent {
+  background: #fff;
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.comments textarea {
+  width: 100%;
+  min-height: 60px;
+  padding: 8px;
+  margin-bottom: 8px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.comments button {
+  background: #1976d2;
+  color: white;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.commentList {
+  margin-top: 12px;
+}
+
+.comment {
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.timestamp {
+  font-size: 12px;
+  color: #888;
+  margin-top: 4px;
+}
+
+.worklogItem {
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.loader {
+  text-align: center;
+  padding: 20px;
+  font-style: italic;
+  color: #777;
+}
+
+.worklog {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.worklogItem {
+  display: flex;
+  align-items: center;
+  background: #f9f9f9;
+  padding: 10px 14px;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: #1976d2;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 16px;
+  margin-right: 12px;
+}
+
+.details {
+  display: flex;
+  flex-direction: column;
+}
+
+.userName {
+  font-weight: 600;
+  color: #333;
+}
+
+.timeInfo {
+  font-size: 13px;
+  color: #777;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.timeIcon {
+  font-size: 16px;
+  color: #777;
+}
+
+

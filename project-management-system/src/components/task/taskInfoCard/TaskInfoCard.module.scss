@@ -1,0 +1,122 @@
+.card {
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+
+  button {
+    text-transform: none;
+    font-weight: 500;
+    font-size: 13px;
+    border-radius: 8px;
+  }
+}
+
+.infoItem {
+  font-size: 14px;
+  color: #444;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  .icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #888;
+  }
+
+  .label {
+    font-weight: 600;
+    color: #333;
+    min-width: 80px;
+  }
+}
+
+.priorityBadge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-left: 8px;
+  text-transform: capitalize;
+}
+
+.priorityBadge.low {
+  background: #b7eb8f;
+  color: #389e0d;
+}
+
+.priorityBadge.medium {
+  background: #ffe58f;
+  color: #d48806;
+}
+
+.priorityBadge.high {
+  background: #ffa39e;
+  color: #cf1322;
+}
+
+.timeTracking {
+  cursor: pointer;
+  margin-top: 12px;
+}
+
+.timeBarBackground {
+  background: #eee;
+  height: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.timeBarFill {
+  background: #1976d2;
+  height: 100%;
+}
+
+.timeText {
+  font-size: 12px;
+  color: #555;
+  margin-top: 4px;
+  text-align: center;
+}
+
+.timeManagement {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid #eee;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  .timeRow {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    color: #555;
+  }
+
+  .timeLabel {
+    font-weight: 500;
+    color: #333;
+  }
+}
+
+.timestamps {
+  margin-top: 12px;
+  font-size: 12px;
+  color: #888;
+  text-align: center;
+  line-height: 1.4;
+}
+

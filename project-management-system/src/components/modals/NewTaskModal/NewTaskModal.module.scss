@@ -1,0 +1,12 @@
+.content {
+  display: flex;
+  gap: 24px;
+  margin-top: 8px;
+}
+
+.formLeft,
+.formRight {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}

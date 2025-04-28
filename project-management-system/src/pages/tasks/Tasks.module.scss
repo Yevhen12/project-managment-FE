@@ -1,0 +1,117 @@
+.tasksPage {
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  input {
+    flex: 1;
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+  }
+
+  .filters {
+    display: flex;
+    gap: 8px;
+
+    select {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+  }
+
+  .newTaskBtn {
+    background-color: #1976d2;
+    color: white;
+    padding: 8px 14px;
+    border-radius: 6px;
+    border: none;
+    font-weight: 500;
+    cursor: pointer;
+  }
+}
+
+.taskList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.taskRow {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border-radius: 8px;
+  padding: 12px 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  gap: 16px;
+  font-size: 14px;
+}
+
+.taskId {
+  font-weight: 600;
+  color: #1976d2;
+  width: 90px;
+}
+
+.taskTitle {
+  flex: 2;
+
+  .title {
+    font-weight: 500;
+  }
+
+  .subtitle {
+    font-size: 12px;
+    color: #888;
+  }
+}
+
+.taskEpic {
+  font-size: 12px;
+  background: #eee;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.status {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.status.todo {
+  background-color: #e0e0e0;
+  color: #555;
+}
+
+.status.qaready {
+  background-color: #b2dfdb;
+  color: #004d40;
+}
+
+.status.codereview {
+  background-color: #bbdefb;
+  color: #0d47a1;
+}
+
+.assignee {
+  font-weight: 500;
+  background: #f1f1f1;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.estimate {
+  color: #888;
+  font-size: 13px;
+}
