@@ -1,0 +1,83 @@
+.wrapper {
+  padding: 24px;
+  background-color: #f8f9fb;
+  min-height: 100vh;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+
+  h2 {
+    font-size: 28px;
+    font-weight: 600;
+    color: #2c3e50;
+  }
+
+  button {
+    font-weight: 500;
+    text-transform: none;
+  }
+}
+
+.memberGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  text-align: center;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: translateY(-3px);
+  }
+}
+
+.avatar {
+  width: 72px;
+  height: 72px;
+  font-size: 28px;
+  margin: 0 auto 12px;
+  background-color: #e0e0e0;
+  color: #2c3e50;
+}
+
+.name {
+  font-weight: 600;
+  font-size: 16px;
+  margin-bottom: 4px;
+  color: #2c3e50;
+}
+
+.role {
+  font-size: 14px;
+  color: #7f8c8d;
+  margin-bottom: 10px;
+}
+
+.email {
+  font-size: 13px;
+  color: #95a5a6;
+  margin-bottom: 12px;
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+
+  button {
+    color: #34495e;
+    &:hover {
+      color: #1976d2;
+    }
+  }
+}

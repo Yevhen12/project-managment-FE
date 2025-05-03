@@ -7,6 +7,8 @@ export enum AppRoutes {
   INVITES = 'invites',
   TASKS = 'tasks',
   TASK_DETAILS = "task_details",
+  SPRINTS = "sprints",
+  TEAM = "team",
   NOT_FOUND = 'not_found',
 }
 
@@ -19,5 +21,7 @@ export const RoutePath: Record<AppRoutes, string> = {
   [AppRoutes.DASHBOARD]: '/dashboard',
   [AppRoutes.PROFILE]: '/profile',
   [AppRoutes.INVITES]: '/invites',
+  [AppRoutes.SPRINTS]: '/sprints',
+  [AppRoutes.TEAM]: '/team',
   [AppRoutes.NOT_FOUND]: '*',
 };

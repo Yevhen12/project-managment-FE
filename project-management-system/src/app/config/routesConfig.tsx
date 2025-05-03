@@ -5,10 +5,12 @@ import NotFoundPage from '../..//pages/notFound';
 import RegisterPage from '../../pages/register';
 import DashboardPage from '../../pages/dashboard';
 import SelectProjectPage from '../../pages/selectProject';
-import ProfilePage from '../../pages/profile';
 import InvitesPage from '../../pages/invites';
 import TasksPage from '../../pages/tasks';
 import TaskDetailsPage from '../../pages/taskDetails';
+import { SprintBoardPage } from '../../pages/sprints';
+import { TeamsPage } from '../../pages/team';
+import { ProfilePage } from '../../pages/profile';
 
 export const routeConfig: Record<AppRoutes, RouteAppProps> = {
   [AppRoutes.MAIN]: {
@@ -39,6 +41,16 @@ export const routeConfig: Record<AppRoutes, RouteAppProps> = {
   [AppRoutes.TASK_DETAILS]: {
     path: RoutePath.task_details,
     element: <TaskDetailsPage />,
+    authOnly: true,
+  },
+  [AppRoutes.SPRINTS]: {
+    path: RoutePath.sprints,
+    element: <SprintBoardPage />,
+    authOnly: true,
+  },
+  [AppRoutes.TEAM]: {
+    path: RoutePath.team,
+    element: <TeamsPage />,
     authOnly: true,
   },
   [AppRoutes.PROFILE]: {

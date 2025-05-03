@@ -1,0 +1,41 @@
+.modal {
+  background: white;
+  padding: 24px;
+  border-radius: 8px;
+  width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  margin: 100px auto;
+  outline: none;
+}
+
+.taskPickerModal {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  margin: 100px auto;
+  outline: none;
+  display: flex;
+  flex-direction: column;
+}
+
+.taskList {
+  max-height: 300px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.selectedTasks {
+  margin-top: 12px;
+  font-size: 14px;
+
+  ul {
+    margin-top: 4px;
+    padding-left: 20px;
+  }
+}

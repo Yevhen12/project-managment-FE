@@ -1,0 +1,116 @@
+.wrapper {
+  padding: 24px;
+}
+
+.sprintHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.sprintInfo {
+  h1 {
+    font-size: 24px;
+    margin-bottom: 6px;
+  }
+
+  .sprintMeta {
+    font-size: 14px;
+    color: #666;
+    
+    span {
+      margin-right: 12px;
+    }
+  }
+}
+
+.sprintActions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+
+  input {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+  }
+
+  button {
+    text-transform: none;
+    font-size: 13px;
+    border-radius: 8px;
+  }
+}
+
+.board {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+}
+
+.column {
+  background: #f9f9f9;
+  border-radius: 8px;
+  padding: 12px;
+  min-width: 260px;
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 250px);
+}
+
+.columnHeader {
+  font-weight: 600;
+  margin-bottom: 12px;
+  font-size: 16px;
+}
+
+.tasksArea {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.taskCardWrapper {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.filtersWrapper {
+  margin-top: 24px;
+}
+
+.actionsRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+
+  .searchInput {
+    min-width: 200px;
+  }
+
+  .filterSelect {
+    min-width: 150px;
+  }
+}
+
+
+
+
+
