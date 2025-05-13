@@ -1,38 +1,38 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useParams } from "react-router-dom";
 import styles from "../ActivitySection.module.scss";
 import { CommentType } from "../../../shared/types/task";
+import {
+  useAddCommentMutation,
+  useGetTaskByIdQuery,
+} from "../../../api/taskApi";
+import { useAppSelector } from "../../../shared/hooks/useAppSelector";
 
-export const Comments = () => {
-  const [comments, setComments] = useState<CommentType[]>([]);
+interface CommentsProps {
+  comments: CommentType[];
+}
+
+export const Comments = ({ comments }: CommentsProps) => {
+  const { taskId } = useParams<{ taskId: string }>();
   const [newComment, setNewComment] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [addComment] = useAddCommentMutation();
+  const currentUser = useAppSelector((state) => state.auth.user);
 
-  useEffect(() => {
-    setTimeout(() => {
-      setComments([
-        { id: 1, author: "Yevhen", text: "Looks good!", createdAt: new Date() },
-        { id: 2, author: "Oleh", text: "Need help with this.", createdAt: new Date() },
-      ]);
-      setLoading(false);
-    }, 1000); // імітація завантаження 1 секунда
-  }, []);
+  const { refetch } = useGetTaskByIdQuery(taskId!, {
+    skip: !taskId,
+  });
 
-  const handleAddComment = () => {
-    if (newComment.trim()) {
-      const comment = {
-        id: Date.now(),
-        author: "Current User",
-        text: newComment,
-        createdAt: new Date(),
-      };
-      setComments((prev) => [comment, ...prev]);
+  const handleAddComment = async () => {
+    if (!newComment.trim() || !taskId) return;
+
+    try {
+      await addComment({ taskId, text: newComment }).unwrap();
       setNewComment("");
+      await refetch();
+    } catch (err) {
+      console.error("Failed to add comment", err);
     }
   };
-
-  if (loading) {
-    return <div className={styles.loader}>Loading comments...</div>;
-  }
 
   return (
     <div className={styles.comments}>
@@ -46,8 +46,13 @@ export const Comments = () => {
       <div className={styles.commentList}>
         {comments.map((comment) => (
           <div key={comment.id} className={styles.comment}>
-            <strong>{comment.author}</strong>: {comment.text}
-            <div className={styles.timestamp}>{comment.createdAt.toLocaleString()}</div>
+            <strong>
+              {comment.author?.firstName} {comment.author?.lastName}
+            </strong>
+            : {comment.content}
+            <div className={styles.timestamp}>
+              {new Date(comment.createdAt).toLocaleString()}
+            </div>
           </div>
         ))}
       </div>

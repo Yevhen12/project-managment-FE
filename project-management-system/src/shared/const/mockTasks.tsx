@@ -1,3 +1,5 @@
+//@ts-nocheck
+
 import { Bug, Rocket, Landmark } from "lucide-react";
 import { Task } from "../types/task";
 

@@ -1,38 +1,40 @@
 import React, { useState } from "react";
-import { Button, Avatar, IconButton, Chip, Tooltip } from "@mui/material";
+import {
+  Button,
+  Avatar,
+  IconButton,
+  Chip,
+  Tooltip,
+  CircularProgress,
+  Alert,
+} from "@mui/material";
 import { Edit, Delete } from "@mui/icons-material";
 import styles from "./Team.module.scss";
 import AddMemberModal from "../../components/modals/AddMemberModal";
 import EditRoleModal from "../../components/modals/EditRoleModal";
 import ConfirmDeleteModal from "../../components/modals/ConfirmDeleteModal";
 import ActiveProjectLayout from "../../app/layouts";
-
-const mockTeamMembers = [
-  {
-    id: "1",
-    name: "Yevhen Lys",
-    role: "Admin",
-    avatar: "YL",
-    email: "yevhen.lys@example.com",
-  },
-  {
-    id: "2",
-    name: "Olga T.",
-    role: "Developer",
-    avatar: "OT",
-    email: "olga.t@example.com",
-  },
-  {
-    id: "3",
-    name: "Andrii R.",
-    role: "Tester",
-    avatar: "AR",
-    email: "andrii.r@example.com",
-  },
-];
+import { useAppSelector } from "../../shared/hooks/useAppSelector";
+import {
+  useDeleteTeamMemberMutation,
+  useGetTeamForProjectQuery,
+  useUpdateTeamMemberRoleMutation,
+} from "../../api/project";
 
 export const TeamsPage = () => {
-  const [team, setTeam] = useState(mockTeamMembers);
+  const projectId = useAppSelector(
+    (state) => state.activeProject.activeProject?.id
+  );
+  const currentUserId = useAppSelector((state) => state.auth.user?.id);
+  const {
+    data: team = [],
+    isLoading,
+    error,
+    refetch, // ✅ додано
+  } = useGetTeamForProjectQuery(projectId!, { skip: !projectId });
+  const [updateRole] = useUpdateTeamMemberRoleMutation();
+  const [deleteMember] = useDeleteTeamMemberMutation();
+
   const [addOpen, setAddOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -43,28 +45,38 @@ export const TeamsPage = () => {
     setEditOpen(true);
   };
 
+  const confirmDelete = async () => {
+    if (!selectedMember || !projectId) return;
+    try {
+      await deleteMember({
+        userId: selectedMember.user.id,
+        projectId,
+      }).unwrap();
+      setDeleteOpen(false);
+      refetch();
+    } catch (err) {
+      console.error("Failed to delete member", err);
+    }
+  };
+
+  const handleRoleUpdate = async (updatedRole: string) => {
+    if (!selectedMember || !projectId) return;
+    try {
+      await updateRole({
+        userId: selectedMember.user.id,
+        projectId,
+        newRole: updatedRole.toLowerCase(),
+      }).unwrap();
+      setEditOpen(false);
+      refetch();
+    } catch (err) {
+      console.error("Failed to update role", err);
+    }
+  };
+
   const handleDelete = (member: any) => {
     setSelectedMember(member);
     setDeleteOpen(true);
-  };
-
-  const confirmDelete = () => {
-    setTeam(team.filter((m) => m.id !== selectedMember?.id));
-    setDeleteOpen(false);
-  };
-
-  const handleRoleUpdate = (updatedRole: string) => {
-    setTeam(
-      team.map((m) =>
-        m.id === selectedMember?.id ? { ...m, role: updatedRole } : m
-      )
-    );
-    setEditOpen(false);
-  };
-
-  const handleAddMember = (newMember: any) => {
-    setTeam([...team, newMember]);
-    setAddOpen(false);
   };
 
   return (
@@ -81,44 +93,67 @@ export const TeamsPage = () => {
           </Button>
         </div>
 
-        <div className={styles.memberGrid}>
-          {team.map((member) => (
-            <div key={member.id} className={styles.card}>
-              <Avatar className={styles.avatar}>{member.avatar}</Avatar>
-              <div className={styles.name}>{member.name}</div>
-              <div className={styles.email}>{member.email}</div>
-              <Chip
-                label={member.role}
-                size="small"
-                color={
-                  member.role === "Admin"
-                    ? "primary"
-                    : member.role === "Developer"
-                    ? "success"
-                    : "default"
-                }
-                style={{ marginBottom: "10px" }}
-              />
-              <div className={styles.actions}>
-                <Tooltip title="Edit Role">
-                  <IconButton onClick={() => handleEdit(member)}>
-                    <Edit />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title="Remove Member">
-                  <IconButton onClick={() => handleDelete(member)}>
-                    <Delete />
-                  </IconButton>
-                </Tooltip>
-              </div>
-            </div>
-          ))}
-        </div>
+        {isLoading ? (
+          <CircularProgress />
+        ) : error ? (
+          <Alert severity="error">Failed to load team members</Alert>
+        ) : (
+          <div className={styles.memberGrid}>
+            {team.map((member) => {
+              const fullName = `${member.user.firstName} ${member.user.lastName}`;
+              const initials = `${member.user.firstName?.[0] || ""}${
+                member.user.lastName?.[0] || ""
+              }`;
+
+              const isOnlySelf = member.user.id === currentUserId;
+
+              return (
+                <div key={member.id} className={styles.card}>
+                  <Avatar className={styles.avatar}>{initials}</Avatar>
+                  <div className={styles.name}>{fullName}</div>
+                  <div className={styles.email}>{member.user.email}</div>
+                  <Chip
+                    label={member.role}
+                    size="small"
+                    color={
+                      member.role === "admin"
+                        ? "primary"
+                        : member.role === "developer"
+                        ? "success"
+                        : "default"
+                    }
+                    style={{ marginBottom: "10px" }}
+                  />
+                  <div className={styles.actions}>
+                    {!isOnlySelf && (
+                      <>
+                        <Tooltip title="Edit Role">
+                          <IconButton onClick={() => handleEdit(member)}>
+                            <Edit />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Remove Member">
+                          <IconButton onClick={() => handleDelete(member)}>
+                            <Delete />
+                          </IconButton>
+                        </Tooltip>
+                      </>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
 
         <AddMemberModal
           open={addOpen}
           onClose={() => setAddOpen(false)}
-          onAdd={handleAddMember}
+          onAdd={() => {
+            refetch();
+            setAddOpen(false);
+          }}
+          existingMembers={team}
         />
         <EditRoleModal
           open={editOpen}

@@ -1,3 +1,5 @@
+//@ts-nocheck
+
 import { Task } from "../types/task";
 
 export const users = [

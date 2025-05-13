@@ -1,7 +1,28 @@
 import React from "react";
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography } from "@mui/material";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  Typography,
+} from "@mui/material";
 
-const ConfirmDeleteModal = ({ open, onCancel, onConfirm, member }: any) => {
+interface ConfirmDeleteModalProps {
+  open: boolean;
+  onCancel: () => void;
+  onConfirm: () => void;
+  member: {
+    name: string;
+  } | null;
+}
+
+const ConfirmDeleteModal = ({
+  open,
+  onCancel,
+  onConfirm,
+  member,
+}: ConfirmDeleteModalProps) => {
   return (
     <Dialog open={open} onClose={onCancel} fullWidth maxWidth="xs">
       <DialogTitle>Remove Member</DialogTitle>

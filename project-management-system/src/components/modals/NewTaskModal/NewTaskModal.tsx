@@ -1,14 +1,26 @@
 import React from "react";
-import { Dialog, DialogActions, DialogContent, DialogTitle, Button, TextField, Grid, MenuItem } from "@mui/material";
+import {
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Button,
+  TextField,
+  Grid,
+  MenuItem,
+  Box,
+} from "@mui/material";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { taskTypes, priorities, statuses } from "../../../shared/const/task";
-import { users, sprints, epics } from "../../../shared/const/fakeData";
+import { convertToMinutes } from "../../../shared/utils/time";
 
 interface NewTaskModalProps {
   open: boolean;
   onClose: () => void;
   onCreate: (values: any) => void;
+  team: { id: string; name: string }[];
+  sprints: { id: string; name: string }[];
 }
 
 const validationSchema = Yup.object({
@@ -17,13 +29,20 @@ const validationSchema = Yup.object({
   type: Yup.string().required("Select task type"),
   priority: Yup.string().required("Select priority"),
   status: Yup.string().required("Select status"),
-  epic: Yup.string().required("Select epic"),
-  sprint: Yup.string().required("Select sprint"),
+  sprint: Yup.string().nullable(),
   assignee: Yup.string().required("Select assignee"),
-  estimate: Yup.string(),
+  estimateDays: Yup.number().min(0).nullable(),
+  estimateHours: Yup.number().min(0).max(23).nullable(),
+  estimateMinutes: Yup.number().min(0).max(59).nullable(),
 });
 
-const NewTaskModal: React.FC<NewTaskModalProps> = ({ open, onClose, onCreate }) => {
+const NewTaskModal: React.FC<NewTaskModalProps> = ({
+  open,
+  onClose,
+  onCreate,
+  team,
+  sprints,
+}) => {
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
       <Formik
@@ -33,14 +52,29 @@ const NewTaskModal: React.FC<NewTaskModalProps> = ({ open, onClose, onCreate }) 
           type: "",
           priority: "",
           status: "",
-          epic: "",
           sprint: "",
           assignee: "",
-          estimate: "",
+          estimateDays: "",
+          estimateHours: "",
+          estimateMinutes: "",
         }}
         validationSchema={validationSchema}
         onSubmit={(values, { resetForm }) => {
-          onCreate(values);
+          const { estimateDays, estimateHours, estimateMinutes, ...rest } =
+            values;
+
+          const estimate = convertToMinutes(
+            parseInt(estimateDays || "0", 10),
+            parseInt(estimateHours || "0", 10),
+            parseInt(estimateMinutes || "0", 10)
+          );
+
+          const payload = {
+            ...rest,
+            estimate,
+          };
+
+          onCreate(payload);
           resetForm();
           onClose();
         }}
@@ -50,12 +84,10 @@ const NewTaskModal: React.FC<NewTaskModalProps> = ({ open, onClose, onCreate }) 
             <DialogTitle>Create New Task</DialogTitle>
             <DialogContent>
               <Grid container spacing={3}>
-                {/* LEFT SIDE */}
                 <Grid item xs={12} md={6}>
                   <TextField
                     label="Title"
                     name="title"
-                    placeholder="Enter task title"
                     value={formik.values.title}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
@@ -67,7 +99,6 @@ const NewTaskModal: React.FC<NewTaskModalProps> = ({ open, onClose, onCreate }) 
                   <TextField
                     label="Description"
                     name="description"
-                    placeholder="Short description..."
                     value={formik.values.description}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
@@ -88,9 +119,6 @@ const NewTaskModal: React.FC<NewTaskModalProps> = ({ open, onClose, onCreate }) 
                     fullWidth
                     margin="normal"
                   >
-                    <MenuItem value="" disabled>
-                      Select type
-                    </MenuItem>
                     {taskTypes.map((type) => (
                       <MenuItem key={type.value} value={type.value}>
                         {type.icon} {type.label}
@@ -104,14 +132,15 @@ const NewTaskModal: React.FC<NewTaskModalProps> = ({ open, onClose, onCreate }) 
                     value={formik.values.priority}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    error={formik.touched.priority && Boolean(formik.errors.priority)}
-                    helperText={formik.touched.priority && formik.errors.priority}
+                    error={
+                      formik.touched.priority && Boolean(formik.errors.priority)
+                    }
+                    helperText={
+                      formik.touched.priority && formik.errors.priority
+                    }
                     fullWidth
                     margin="normal"
                   >
-                    <MenuItem value="" disabled>
-                      Select priority
-                    </MenuItem>
                     {priorities.map((priority) => (
                       <MenuItem key={priority.value} value={priority.value}>
                         {priority.icon} {priority.label}
@@ -120,7 +149,6 @@ const NewTaskModal: React.FC<NewTaskModalProps> = ({ open, onClose, onCreate }) 
                   </TextField>
                 </Grid>
 
-                {/* RIGHT SIDE */}
                 <Grid item xs={12} md={6}>
                   <TextField
                     select
@@ -129,14 +157,13 @@ const NewTaskModal: React.FC<NewTaskModalProps> = ({ open, onClose, onCreate }) 
                     value={formik.values.status}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    error={formik.touched.status && Boolean(formik.errors.status)}
+                    error={
+                      formik.touched.status && Boolean(formik.errors.status)
+                    }
                     helperText={formik.touched.status && formik.errors.status}
                     fullWidth
                     margin="normal"
                   >
-                    <MenuItem value="" disabled>
-                      Select status
-                    </MenuItem>
                     {statuses.map((status) => (
                       <MenuItem key={status.value} value={status.value}>
                         {status.label}
@@ -145,43 +172,18 @@ const NewTaskModal: React.FC<NewTaskModalProps> = ({ open, onClose, onCreate }) 
                   </TextField>
                   <TextField
                     select
-                    label="Epic"
-                    name="epic"
-                    value={formik.values.epic}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    error={formik.touched.epic && Boolean(formik.errors.epic)}
-                    helperText={formik.touched.epic && formik.errors.epic}
-                    fullWidth
-                    margin="normal"
-                  >
-                    <MenuItem value="" disabled>
-                      Select epic
-                    </MenuItem>
-                    {epics.map((epic) => (
-                      <MenuItem key={epic.value} value={epic.value}>
-                        {epic.label}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                  <TextField
-                    select
-                    label="Sprint"
+                    label="Sprint (optional)"
                     name="sprint"
                     value={formik.values.sprint}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    error={formik.touched.sprint && Boolean(formik.errors.sprint)}
-                    helperText={formik.touched.sprint && formik.errors.sprint}
                     fullWidth
                     margin="normal"
                   >
-                    <MenuItem value="" disabled>
-                      Select sprint
-                    </MenuItem>
-                    {sprints.map((sprint) => (
-                      <MenuItem key={sprint.value} value={sprint.value}>
-                        {sprint.label}
+                    <MenuItem value="">No Sprint</MenuItem>
+                    {sprints?.map((s) => (
+                      <MenuItem key={s.id} value={s.name}>
+                        {s.name}
                       </MenuItem>
                     ))}
                   </TextField>
@@ -192,34 +194,70 @@ const NewTaskModal: React.FC<NewTaskModalProps> = ({ open, onClose, onCreate }) 
                     value={formik.values.assignee}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    error={formik.touched.assignee && Boolean(formik.errors.assignee)}
-                    helperText={formik.touched.assignee && formik.errors.assignee}
+                    error={
+                      formik.touched.assignee && Boolean(formik.errors.assignee)
+                    }
+                    helperText={
+                      formik.touched.assignee && formik.errors.assignee
+                    }
                     fullWidth
                     margin="normal"
                   >
-                    <MenuItem value="" disabled>
-                      Select assignee
-                    </MenuItem>
-                    {users.map((user) => (
-                      <MenuItem key={user.id} value={user.name}>
-                        <span style={{ marginRight: 8 }}>{user.avatar}</span> {user.name}
+                    {team?.map((member) => (
+                      <MenuItem key={member.id} value={member.name}>
+                        {member.name}
                       </MenuItem>
                     ))}
                   </TextField>
-                  <TextField
-                    label="Estimate (e.g. 2d 4h)"
-                    name="estimate"
-                    placeholder="2d 4h"
-                    value={formik.values.estimate}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    fullWidth
-                    margin="normal"
-                  />
+
+                  <Box mt={2}>
+                    <div
+                      style={{ fontSize: 13, fontWeight: 600, marginBottom: 4 }}
+                    >
+                      Estimate (duration)
+                    </div>
+                    <Grid container spacing={1}>
+                      <Grid item xs={4}>
+                        <TextField
+                          label="Days"
+                          name="estimateDays"
+                          type="number"
+                          value={formik.values.estimateDays}
+                          onChange={formik.handleChange}
+                          onBlur={formik.handleBlur}
+                          fullWidth
+                          inputProps={{ min: 0 }}
+                        />
+                      </Grid>
+                      <Grid item xs={4}>
+                        <TextField
+                          label="Hours"
+                          name="estimateHours"
+                          type="number"
+                          value={formik.values.estimateHours}
+                          onChange={formik.handleChange}
+                          onBlur={formik.handleBlur}
+                          fullWidth
+                          inputProps={{ min: 0, max: 23 }}
+                        />
+                      </Grid>
+                      <Grid item xs={4}>
+                        <TextField
+                          label="Minutes"
+                          name="estimateMinutes"
+                          type="number"
+                          value={formik.values.estimateMinutes}
+                          onChange={formik.handleChange}
+                          onBlur={formik.handleBlur}
+                          fullWidth
+                          inputProps={{ min: 0, max: 59 }}
+                        />
+                      </Grid>
+                    </Grid>
+                  </Box>
                 </Grid>
               </Grid>
             </DialogContent>
-
             <DialogActions>
               <Button onClick={onClose} color="inherit">
                 Cancel

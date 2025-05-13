@@ -37,11 +37,9 @@
 .typeBadge.bug {
   background-color: #f8d7da;
 }
-
 .typeBadge.story {
   background-color: #d1ecf1;
 }
-
 .typeBadge.epic {
   background-color: #d4edda;
 }
@@ -49,6 +47,7 @@
 .taskId {
   font-weight: 600;
   color: #1976d2;
+  white-space: nowrap;
 }
 
 .titleSection {
@@ -61,8 +60,12 @@
   }
 
   .subtitle {
-    font-size: 12px;
-    color: #888;
+  max-width: 400px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: #555;
+  font-size: 0.95rem;
   }
 }
 
@@ -81,27 +84,31 @@
   min-width: 90px;
   text-transform: uppercase;
 }
-
 .status.todo {
   background-color: #e0e0e0;
   color: #555;
 }
-
 .status.qaready {
   background-color: #c8e6c9;
   color: #256029;
 }
-
 .status.codereview {
   background-color: #bbdefb;
   color: #0d47a1;
 }
 
 .estimate {
+  min-width: 50px;
   font-size: 12px;
-  color: #888;
-  min-width: 40px;
+  font-weight: 500;
+  color: #333;
+  padding: 4px 8px;
+  background-color: #f0f4ff;
+  border-radius: 999px;
   text-align: center;
+  white-space: nowrap;
+  display: inline-block;
+  border: 1px solid #d0dcf1;
 }
 
 .assigneeBlock {
@@ -111,28 +118,44 @@
 }
 
 .assignee {
-  background: #f1f1f1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.avatar {
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
-  width: 32px;
-  height: 32px;
-  font-size: 14px;
-  font-weight: 600;
-  color: #555;
+  object-fit: cover;
+}
+
+.avatarFallback {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: #c5cae9;
+  color: #3f51b5;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.assigneeName {
+  font-size: 13px;
+  color: #333;
 }
 
 .priorityHigh {
   color: red;
   font-size: 16px;
 }
-
 .priorityMedium {
   color: orange;
   font-size: 16px;
 }
-
 .priorityLow {
   color: blue;
   font-size: 16px;
@@ -145,6 +168,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+
   .priorityBlocker {
     color: white;
     font-weight: bold;

@@ -1,21 +1,32 @@
 export type TaskType = "story" | "bug" | "epic";
-export type TaskStatus = "TO_DO" | "QA_READY" | "CODE_REVIEW" | "HOLD" | "IN_PROGRESS" | "DONE";
+export type TaskStatus =
+  | "TO_DO"
+  | "QA_READY"
+  | "CODE_REVIEW"
+  | "HOLD"
+  | "IN_PROGRESS"
+  | "DONE";
 export type TaskPriority = "high" | "medium" | "low" | "blocker";
 
 export type Attachment = {
   id: string;
-  name: string;
+  fileName: string;
   url: string;
   type: "image" | "file";
 };
 
-export type CommentType = {
-  id: number;
-  author: string;
-  text: string;
-  createdAt: Date;
-};
+export interface CommentType {
+  id: string;
+  content: string;
+  createdAt: string;
+  author: {
+    id: string;
+    firstName: string;
+    lastName: string;
+  };
+}
 
+export type WorkLogEntry = {};
 
 export type Task = {
   id: string;
@@ -26,21 +37,27 @@ export type Task = {
   typeIcon?: React.ReactNode;
   status: string;
   statusLabel?: string;
+  sprint?: any;
   sprintName?: string;
   epic?: string;
-  attachments?: Attachment[]
+  comments?: CommentType[];
+  loggedTime?: number;
+  workLogs?: any;
+  attachments?: Attachment[];
   priority: "low" | "medium" | "high" | "blocker";
-  assignee?: string;
+  assignee?: any;
   assigneeAvatar?: string;
-  reporter?: string;
+  reporter?: any;
   reporterAvatar?: string;
   labels?: string[];
-  estimate: string;
+  estimate: number;
   devStart?: string;
   devEnd?: string;
   qaStart?: string;
   qaEnd?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  sprintId?: string
 };
-
 
 export type TasksList = Task[];

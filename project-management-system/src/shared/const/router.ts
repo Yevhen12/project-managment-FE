@@ -1,5 +1,5 @@
 export enum AppRoutes {
-  MAIN = 'main',
+  SELECT_PROJECT = 'select_project',
   LOGIN = 'login',
   REGISTER = 'register',
   DASHBOARD = 'dashboard',
@@ -13,7 +13,7 @@ export enum AppRoutes {
 }
 
 export const RoutePath: Record<AppRoutes, string> = {
-  [AppRoutes.MAIN]: '/',
+  [AppRoutes.SELECT_PROJECT]: '/select_project',
   [AppRoutes.LOGIN]: '/login',
   [AppRoutes.TASKS]: '/tasks',
   [AppRoutes.TASK_DETAILS]: "/tasks/:taskId",

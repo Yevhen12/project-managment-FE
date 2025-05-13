@@ -1,45 +1,61 @@
-import { useEffect, useState } from "react";
 import styles from "../ActivitySection.module.scss";
-import AccessTimeIcon from "@mui/icons-material/AccessTime"; // Іконка годинника
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
 
-type WorkLogEntry = {
-  id: number;
-  user: string;
-  timeSpent: string;
-  date: string;
+interface WorkLogEntry {
+  id: string;
+  timeSpent: number;
+  workDate: string;
+  createdAt: string;
+  user: {
+    firstName: string;
+    lastName: string;
+    avatar?: string | null;
+  };
+}
+
+interface WorkLogProps {
+  worklog: WorkLogEntry[];
+}
+
+const formatTimeSpent = (minutes: number): string => {
+  const days = Math.floor(minutes / 1440);
+  const hours = Math.floor((minutes % 1440) / 60);
+  const mins = minutes % 60;
+
+  const parts = [];
+  if (days) parts.push(`${days}d`);
+  if (hours) parts.push(`${hours}h`);
+  if (mins || parts.length === 0) parts.push(`${mins}m`);
+
+  return parts.join(" ");
 };
 
-export const WorkLog = () => {
-  const [workLogs, setWorkLogs] = useState<WorkLogEntry[]>([]);
-  const [loading, setLoading] = useState(true);
+const formatDate = (dateStr: string) => {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString();
+};
 
-  useEffect(() => {
-    setTimeout(() => {
-      setWorkLogs([
-        { id: 1, user: "Dhiraj Chore", timeSpent: "30m", date: "23 квітня 2025" },
-        { id: 2, user: "Dhiraj Chore", timeSpent: "30m", date: "22 квітня 2025" },
-        { id: 3, user: "Oleksandr Nazarenko", timeSpent: "3h", date: "25 лютого 2025" },
-      ]);
-      setLoading(false);
-    }, 1000);
-  }, []);
-
-  if (loading) {
-    return <div className={styles.loader}>Loading work logs...</div>;
-  }
+export const WorkLog = ({ worklog }: WorkLogProps) => {
+  const getInitials = (firstName = "", lastName = "") =>
+    `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
 
   return (
     <div className={styles.worklog}>
-      {workLogs.map((log) => (
+      {worklog.map((log) => (
         <div key={log.id} className={styles.worklogItem}>
           <div className={styles.avatar}>
-            {log.user.charAt(0).toUpperCase()}
+            {getInitials(log.user?.firstName, log.user?.lastName)}
           </div>
           <div className={styles.details}>
-            <div className={styles.userName}>{log.user}</div>
+            <div className={styles.userName}>
+              {log.user?.firstName} {log.user?.lastName}
+            </div>
             <div className={styles.timeInfo}>
               <AccessTimeIcon fontSize="small" className={styles.timeIcon} />
-              {log.timeSpent} — {log.date}
+              {formatTimeSpent(log.timeSpent)} — {formatDate(log.workDate)}
+              <span className={styles.loggedOn}>
+                &nbsp;| Logged on: {formatDate(log.createdAt)}
+              </span>
             </div>
           </div>
         </div>

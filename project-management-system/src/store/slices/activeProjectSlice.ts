@@ -1,23 +1,23 @@
-// src/shared/store/activeProjectSlice.ts
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { Project } from "../../shared/types/project";
 
-interface State {
-  activeProjectId: string | null;
+interface ActiveProjectState {
+  activeProject: Project | null;
 }
 
-const initialState: State = {
-  activeProjectId: null,
+const initialState: ActiveProjectState = {
+  activeProject: null,
 };
 
-export const activeProjectSlice = createSlice({
-  name: 'activeProject',
+const activeProjectSlice = createSlice({
+  name: "activeProject",
   initialState,
   reducers: {
-    setActiveProject: (state, action: PayloadAction<string>) => {
-      state.activeProjectId = action.payload;
+    setActiveProject(state, action: PayloadAction<Project>) {
+      state.activeProject = action.payload;
     },
-    clearActiveProject: (state) => {
-      state.activeProjectId = null;
+    clearActiveProject(state) {
+      state.activeProject = null;
     },
   },
 });

@@ -7,17 +7,17 @@ export const taskTypes = [
 ];
 
 export const priorities = [
-  { value: "high", label: "High", icon: <ArrowUp size={14} color="#f5a623" /> },  // Жовтий ап
-  { value: "medium", label: "Medium", icon: <ArrowUp size={14} color="#3498db" /> }, // Синій ап
-  { value: "low", label: "Low", icon: <ArrowUp size={14} color="#95a5a6" /> }, // Сірий ап
-  { value: "blocker", label: "Blocker", icon: <AlertCircle size={14} color="#e74c3c" /> }, // Блокер
+  { value: "High", label: "High", icon: <ArrowUp size={14} color="#f5a623" /> },  // Жовтий ап
+  { value: "Medium", label: "Medium", icon: <ArrowUp size={14} color="#3498db" /> }, // Синій ап
+  { value: "Low", label: "Low", icon: <ArrowUp size={14} color="#95a5a6" /> }, // Сірий ап
+  // { value: "blocker", label: "Blocker", icon: <AlertCircle size={14} color="#e74c3c" /> }, // Блокер
 ];
 
 export const statuses = [
-  { value: "todo", label: "To Do" },
-  { value: "in_progress", label: "In Progress" },
-  { value: "qa_ready", label: "QA Ready" },
-  { value: "qa_testing", label: "QA Testing" },
-  { value: "code_review", label: "Code Review" },
-  { value: "done", label: "Done" },
+  { value: "TO_DO", label: "To Do" },
+  { value: "IN_PROGRESS", label: "In Progress" },
+  { value: "QA_READY", label: "QA Ready" },
+  { value: "QA_TESTING", label: "QA Testing" },
+  { value: "REVIEW", label: "Review" },
+  { value: "DONE", label: "Done" },
 ];

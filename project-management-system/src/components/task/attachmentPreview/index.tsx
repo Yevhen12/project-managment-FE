@@ -1,29 +1,39 @@
-import { Dialog, DialogContent } from "@mui/material";
+import { Dialog, DialogContent, IconButton } from "@mui/material";
 import { useState } from "react";
-import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile"; // <-- Іконка файла
+import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 type AttachmentProps = {
+  id: string;
   name: string;
   url: string;
-  type: "image" | "file";
+  onDelete: (id: string) => void;
 };
 
-export const AttachmentPreview = ({ name, url, type }: AttachmentProps) => {
+export const AttachmentPreview = ({ id, name, url, onDelete }: AttachmentProps) => {
   const [open, setOpen] = useState(false);
+  const [hover, setHover] = useState(false);
 
-  const handleOpenImage = () => {
-    if (type === "image") {
-      setOpen(true);
-    } else {
-      window.open(url, "_blank"); // якщо файл — просто відкриваємо в новій вкладці
-    }
+  const isImage = /\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(url);
+
+  const handleOpen = () => {
+    if (isImage) setOpen(true);
+    else window.open(url, "_blank");
+  };
+
+  const handleDelete = (e: React.MouseEvent) => {
+    e.stopPropagation(); // не відкривати зображення при натисканні на іконку
+    onDelete(id);
   };
 
   return (
     <>
       <div
-        onClick={handleOpenImage}
+        onClick={handleOpen}
+        onMouseEnter={() => setHover(true)}
+        onMouseLeave={() => setHover(false)}
         style={{
+          position: "relative",
           cursor: "pointer",
           width: "150px",
           height: "150px",
@@ -34,10 +44,25 @@ export const AttachmentPreview = ({ name, url, type }: AttachmentProps) => {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          position: "relative",
         }}
       >
-        {type === "image" ? (
+        {hover && (
+          <IconButton
+            onClick={handleDelete}
+            size="small"
+            style={{
+              position: "absolute",
+              top: 4,
+              right: 4,
+              backgroundColor: "rgba(255,255,255,0.8)",
+              zIndex: 2,
+            }}
+          >
+            <DeleteIcon fontSize="small" color="error" />
+          </IconButton>
+        )}
+
+        {isImage ? (
           <img
             src={url}
             alt={name}
@@ -48,16 +73,17 @@ export const AttachmentPreview = ({ name, url, type }: AttachmentProps) => {
         )}
       </div>
 
-      {/* Модалка для картинки */}
-      <Dialog open={open} onClose={() => setOpen(false)} maxWidth="lg">
-        <DialogContent style={{ padding: 0 }}>
-          <img
-            src={url}
-            alt={name}
-            style={{ width: "100%", height: "auto", display: "block" }}
-          />
-        </DialogContent>
-      </Dialog>
+      {isImage && (
+        <Dialog open={open} onClose={() => setOpen(false)} maxWidth="lg">
+          <DialogContent style={{ padding: 0 }}>
+            <img
+              src={url}
+              alt={name}
+              style={{ width: "100%", height: "auto", display: "block" }}
+            />
+          </DialogContent>
+        </Dialog>
+      )}
     </>
   );
 };

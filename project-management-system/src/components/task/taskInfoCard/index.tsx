@@ -2,9 +2,14 @@ import { FC, useState } from "react";
 import { Task } from "../../../shared/types/task";
 import styles from "./TaskInfoCard.module.scss";
 import { Button } from "@mui/material";
-import { Edit2, Trash2, Tag, User, Clock, Flag, Hash } from "lucide-react"; // лайт іконки
+import { Edit2, Trash2, Tag, User, Clock, Flag, Hash } from "lucide-react";
 import { LogWorkModal } from "../../../components/modals/LogWorkModal";
 import { formatLoggedTime } from "../utils";
+import { formatMinutes } from "../../../shared/utils/time";
+import {
+  useAddWorkLogMutation,
+  useGetTaskByIdQuery,
+} from "../../../api/taskApi";
 
 interface TaskInfoCardProps {
   task: Task;
@@ -19,29 +24,56 @@ export const TaskInfoCard: FC<TaskInfoCardProps> = ({
 }) => {
   const [isLogWorkModalOpen, setLogWorkModalOpen] = useState(false);
 
+  const [addWorkLog] = useAddWorkLogMutation();
+  const { refetch } = useGetTaskByIdQuery(task.id);
+
   const handleOpenLogWorkModal = () => setLogWorkModalOpen(true);
   const handleCloseLogWorkModal = () => setLogWorkModalOpen(false);
 
-  const handleLogWork = (data: { days: number; hours: number; minutes: number; date: string; comment: string }) => {
-    const totalMinutes = data.days * 24 * 60 + data.hours * 60 + data.minutes;
-    
-    const formattedTime = formatLoggedTime(data.days, data.hours, data.minutes); // 🧩 тут нова функція
-  
-    // setWorkLogs((prev) => [
-    //   ...prev,
-    //   {
-    //     id: prev.length + 1,
-    //     user: currentUserName,
-    //     timeSpent: formattedTime, // ось тут форматована строка
-    //     date: data.date,
-    //     comment: data.comment,
-    //   },
-    // ]);
-  
-    // setLoggedMinutes((prev) => prev + totalMinutes);
+  const handleLogWork = async (data: {
+    days: number;
+    hours: number;
+    minutes: number;
+    date: string;
+    comment: string;
+  }) => {
+    const totalMinutes = data.days * 1440 + data.hours * 60 + data.minutes;
+
+    try {
+      await addWorkLog({
+        taskId: task.id,
+        timeSpent: totalMinutes,
+        workDate: data.date,
+        comment: data.comment,
+      }).unwrap();
+
+      await refetch(); // 🔁 оновлення task
+      handleCloseLogWorkModal();
+    } catch (err) {
+      console.error("Log work failed:", err);
+    }
   };
-  
-  
+
+  const estimateMinutes = Number(task.estimate) || 0;
+  const loggedMinutes = task.loggedTime ?? 0;
+  const remainingMinutes = Math.max(estimateMinutes - loggedMinutes, 0);
+
+  const estimateFormatted = formatMinutes(estimateMinutes);
+  const loggedFormatted = formatMinutes(loggedMinutes);
+  const remainingFormatted = formatMinutes(remainingMinutes);
+  const progressPercent = estimateMinutes
+    ? Math.min((loggedMinutes / estimateMinutes) * 100, 100)
+    : 0;
+
+  const assigneeName =
+    typeof task.assignee === "object"
+      ? `${task.assignee.firstName} ${task.assignee.lastName}`
+      : task.assignee || "Unassigned";
+
+  const reporterName =
+    typeof task.reporter === "object"
+      ? `${task.reporter.firstName} ${task.reporter.lastName}`
+      : task.reporter || "Unknown";
 
   return (
     <>
@@ -78,19 +110,17 @@ export const TaskInfoCard: FC<TaskInfoCardProps> = ({
           <span className={styles.icon}>
             <User size={16} />
           </span>
-          <span className={styles.label}>Assignee:</span>{" "}
-          {task.assignee || "Unassigned"}
+          <span className={styles.label}>Assignee:</span> {assigneeName}
         </div>
 
         <div className={styles.infoItem}>
           <span className={styles.icon}>
             <User size={16} />
           </span>
-          <span className={styles.label}>Reporter:</span>{" "}
-          {task.reporter || "Unknown"}
+          <span className={styles.label}>Reporter:</span> {reporterName}
         </div>
 
-        {task.labels && task.labels.length > 0 && (
+        {task?.labels && task?.labels?.length > 0 && (
           <div className={styles.infoItem}>
             <span className={styles.icon}>
               <Tag size={16} />
@@ -116,50 +146,61 @@ export const TaskInfoCard: FC<TaskInfoCardProps> = ({
           </div>
         )}
 
-        {task.estimate && (
-          <div className={styles.infoItem}>
-            <span className={styles.icon}>
-              <Clock size={16} />
-            </span>
-            <span className={styles.label}>Estimate:</span> {task.estimate}
-          </div>
-        )}
+        <div className={styles.infoItem}>
+          <span className={styles.icon}>
+            <Clock size={16} />
+          </span>
+          <span className={styles.label}>Estimate:</span> {estimateFormatted}
+        </div>
 
-        {task.sprintName && (
+        {task.sprint?.name && (
           <div className={styles.infoItem}>
             <span className={styles.icon}>
               <Hash size={16} />
             </span>
-            <span className={styles.label}>Sprint:</span> {task.sprintName}
+            <span className={styles.label}>Sprint:</span> {task.sprint.name}
           </div>
         )}
 
         <div className={styles.timeTracking} onClick={handleOpenLogWorkModal}>
           <div className={styles.timeBarBackground}>
-            <div className={styles.timeBarFill} style={{ width: "50%" }} />
+            <div
+              className={styles.timeBarFill}
+              style={{ width: `${progressPercent}%` }}
+            />
           </div>
-          <div className={styles.timeText}>2h logged / 4h estimated</div>
+          <div className={styles.timeText}>
+            {loggedFormatted} logged / {estimateFormatted} estimated
+          </div>
           <div className={styles.timeManagement}>
             <div className={styles.timeRow}>
               <span className={styles.timeLabel}>Time logged:</span>
-              <span>2h</span>
+              <span>{loggedFormatted}</span>
             </div>
             <div className={styles.timeRow}>
               <span className={styles.timeLabel}>Time remaining:</span>
-              <span>2h</span>
+              <span>{remainingFormatted}</span>
             </div>
             <div className={styles.timeRow}>
               <span className={styles.timeLabel}>Original estimate:</span>
-              <span>4h</span>
+              <span>{estimateFormatted}</span>
             </div>
           </div>
-
           <div className={styles.timestamps}>
-            <div className={styles.timestamp}>Created: 25 квітня 2025</div>
-            <div className={styles.timestamp}>Updated: 27 квітня 2025</div>
+            {task.createdAt && (
+              <div className={styles.timestamp}>
+                Created: {new Date(task.createdAt).toLocaleDateString()}
+              </div>
+            )}
+            {task.updatedAt && (
+              <div className={styles.timestamp}>
+                Updated: {new Date(task.updatedAt).toLocaleDateString()}
+              </div>
+            )}
           </div>
         </div>
       </div>
+
       <LogWorkModal
         open={isLogWorkModalOpen}
         onClose={handleCloseLogWorkModal}

@@ -1,6 +1,5 @@
 import React from 'react';
 import ActiveProjectLayout from '../../app/layouts';
-import { useActiveProjectData } from '../../shared/hooks/useActiveProjectData';
 import styles from './DashboardPage.module.scss';
 import cardStyles from './DashboardCards.module.scss';
 import { TaskCardItem } from './components/TaskCardItem';
@@ -9,7 +8,7 @@ import { ProjectActivityChart } from './components/ProjectActivityChart';
 import { Link } from 'react-router-dom';
 
 const DashboardPage = () => {
-  const project = useActiveProjectData();
+  const project = {};
 
   const tasks = [
     {
@@ -43,13 +42,13 @@ const DashboardPage = () => {
 
   return (
     <ActiveProjectLayout classname={styles.dashboard}>
-      <h2 className={styles.heading}>{project?.name}</h2>
-      <p className={styles.subheading}>{project?.description}</p>
+      <h2 className={styles.heading}>test</h2>
+      <p className={styles.subheading}>Test</p>
 
       <div className={styles.grid}>
         <div className={styles.card}>
           <h3>Project Overview</h3>
-          <p>{project?.name}</p>
+          <p>Test</p>
         </div>
 
         <div className={styles.card}>

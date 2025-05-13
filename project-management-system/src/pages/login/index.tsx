@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   Box,
   Button,
@@ -6,33 +6,40 @@ import {
   Typography,
   Paper,
   Link,
-} from '@mui/material';
-import { useFormik } from 'formik';
-import * as Yup from 'yup';
-import { useNavigate } from 'react-router-dom';
-import styles from './LoginPage.module.scss';
+  Alert,
+} from "@mui/material";
+import { useFormik } from "formik";
+import * as Yup from "yup";
+import { useNavigate } from "react-router-dom";
+import styles from "./LoginPage.module.scss";
+import { useLoginMutation } from "../../api/authApi";
+import { extractErrorMessage } from "../../shared/utils/errorHelpers";
+import { RoutePath } from "../../shared/const/router";
 
 const validationSchema = Yup.object({
-  email: Yup.string()
-    .email('Invalid email')
-    .required('Email is required'),
+  email: Yup.string().email("Invalid email").required("Email is required"),
   password: Yup.string()
-    .min(6, 'Password must be at least 6 characters')
-    .required('Password is required'),
+    .min(6, "Password must be at least 6 characters")
+    .required("Password is required"),
 });
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const [login, { error, isLoading }] = useLoginMutation();
 
   const formik = useFormik({
     initialValues: {
-      email: '',
-      password: '',
+      email: "",
+      password: "",
     },
     validationSchema,
-    onSubmit: (values) => {
-      console.log('Login values:', values);
-      navigate('/dashboard');
+    onSubmit: async (values) => {
+      try {
+        await login(values).unwrap();
+        navigate(RoutePath.select_project); // після логіну перекидаємо на вибір проєкту
+      } catch (e) {
+        console.log("error", e);
+      }
     },
   });
 
@@ -70,14 +77,23 @@ const LoginPage = () => {
             margin="normal"
           />
 
+          <Box sx={{ minHeight: 48, mt: 2 }}>
+            {error && (
+              <Alert severity="error">
+                {extractErrorMessage(error, "Login failed")}
+              </Alert>
+            )}
+          </Box>
+
           <Box mt={2}>
             <Button
               type="submit"
               variant="contained"
               fullWidth
+              disabled={isLoading}
               className={styles.loginButton}
             >
-              Sign In
+              {isLoading ? "Signing in..." : "Sign In"}
             </Button>
           </Box>
 

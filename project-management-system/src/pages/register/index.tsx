@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   Box,
   Button,
@@ -6,39 +6,59 @@ import {
   Typography,
   Paper,
   Link,
-} from '@mui/material';
-import { useFormik } from 'formik';
-import * as Yup from 'yup';
-import { useNavigate } from 'react-router-dom';
-import styles from './RegisterPage.module.scss';
+  Alert,
+} from "@mui/material";
+import { useFormik } from "formik";
+import * as Yup from "yup";
+import { useNavigate } from "react-router-dom";
+import styles from "./RegisterPage.module.scss";
+import { useRegisterMutation } from "../../api/authApi";
+import { extractErrorMessage } from "../../shared/utils/errorHelpers";
+import { useAppDispatch } from "../../shared/hooks/useAppDispatch";
+import { setCredentials } from "../../store/slices/authSlice";
+import { RoutePath } from "../../shared/const/router";
 
 const validationSchema = Yup.object({
-  firstName: Yup.string().required('First name is required'),
-  lastName: Yup.string().required('Last name is required'),
-  email: Yup.string().email('Invalid email').required('Email is required'),
+  firstName: Yup.string().required("First name is required"),
+  lastName: Yup.string().required("Last name is required"),
+  email: Yup.string().email("Invalid email").required("Email is required"),
   password: Yup.string()
-    .min(6, 'Password must be at least 6 characters')
-    .required('Password is required'),
+    .min(6, "Password must be at least 6 characters")
+    .required("Password is required"),
   confirmPassword: Yup.string()
-    .oneOf([Yup.ref('password')], 'Passwords must match')
-    .required('Confirm your password'),
+    .oneOf([Yup.ref("password")], "Passwords must match")
+    .required("Confirm your password"),
 });
 
 const RegisterPage = () => {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+
+  const [register, { error, isLoading }] = useRegisterMutation();
 
   const formik = useFormik({
     initialValues: {
-      firstName: '',
-      lastName: '',
-      email: '',
-      password: '',
-      confirmPassword: '',
+      firstName: "",
+      lastName: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
     },
     validationSchema,
-    onSubmit: (values) => {
-      console.log('Register values:', values);
-      navigate('/dashboard');
+    onSubmit: async (values) => {
+      try {
+        await register({
+          firstName: values.firstName,
+          lastName: values.lastName,
+          email: values.email,
+          password: values.password,
+        }).unwrap();
+
+        formik.resetForm(); // очищення форми
+        navigate(RoutePath.select_project); // правильний редірект
+      } catch (e) {
+        console.log("error", e);
+      }
     },
   });
 
@@ -58,7 +78,9 @@ const RegisterPage = () => {
               value={formik.values.firstName}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
-              error={formik.touched.firstName && Boolean(formik.errors.firstName)}
+              error={
+                formik.touched.firstName && Boolean(formik.errors.firstName)
+              }
               helperText={formik.touched.firstName && formik.errors.firstName}
               margin="normal"
             />
@@ -120,9 +142,23 @@ const RegisterPage = () => {
             margin="normal"
           />
 
+          <Box sx={{ minHeight: 48, mt: 2 }}>
+            {error && (
+              <Alert severity="error" sx={{ mt: 2 }}>
+                {extractErrorMessage(error, "Registration failed")}
+              </Alert>
+            )}
+          </Box>
+
           <Box mt={2}>
-            <Button type="submit" variant="contained" fullWidth className={styles.registerButton}>
-              Register
+            <Button
+              type="submit"
+              variant="contained"
+              fullWidth
+              disabled={isLoading}
+              className={styles.registerButton}
+            >
+              {isLoading ? "Registering..." : "Register"}
             </Button>
           </Box>
 

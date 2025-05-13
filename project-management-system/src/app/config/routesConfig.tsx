@@ -13,10 +13,10 @@ import { TeamsPage } from '../../pages/team';
 import { ProfilePage } from '../../pages/profile';
 
 export const routeConfig: Record<AppRoutes, RouteAppProps> = {
-  [AppRoutes.MAIN]: {
-    path: RoutePath.main,
+  [AppRoutes.SELECT_PROJECT]: {
+    path: RoutePath.select_project,
     element: <SelectProjectPage />,
-    authOnly: false,
+    authOnly: true,
   },
   [AppRoutes.LOGIN]: {
     path: RoutePath.login,
