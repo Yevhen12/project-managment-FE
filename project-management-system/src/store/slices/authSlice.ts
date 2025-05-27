@@ -12,6 +12,7 @@ export interface User {
   avatarUrl?: string;
   bio?: string;
   phone?: string;
+  isPremium?: boolean
 }
 
 interface AuthState {

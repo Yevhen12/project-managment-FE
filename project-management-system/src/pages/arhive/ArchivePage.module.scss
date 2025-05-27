@@ -1,0 +1,42 @@
+.wrapper {
+  padding: 24px;
+}
+
+.title {
+  margin-bottom: 24px;
+  font-weight: 600;
+}
+
+.sprintCard {
+  margin-bottom: 12px;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  background-color: #fafafa;
+}
+
+.sprintHeader {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  align-items: center;
+}
+
+.sprintName {
+  font-weight: 500;
+}
+
+.dateRange {
+  color: #666;
+  font-size: 0.875rem;
+}
+
+.taskList {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.loadingWrapper {
+  display: flex;
+  justify-content: center;
+  padding: 40px 0;
+}

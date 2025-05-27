@@ -23,11 +23,8 @@ const Header = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
-  const state = useAppSelector((state) => state);
-
   const user = useAppSelector((state) => state.auth.user);
   const isAuthenticated = !!user;
-
   const open = Boolean(anchorEl);
 
   const handleOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -52,6 +49,10 @@ const Header = () => {
     navigate(RoutePath.select_project);
   };
 
+  const handleSubcription = () => {
+    navigate(RoutePath.subscription);
+  };
+
   return (
     <header
       style={{
@@ -61,9 +62,44 @@ const Header = () => {
         padding: "10px 20px",
         background: "#1976d2",
         color: "#fff",
+        gap: "12px",
       }}
     >
-      {isAuthenticated ? (
+      {isAuthenticated &&
+        (user.isPremium ? (
+          <Box
+            sx={{
+              backgroundColor: "#f4a825",
+              color: "#fff",
+              fontWeight: 600,
+              px: 2,
+              py: "6px",
+              borderRadius: 2,
+              fontSize: "0.875rem",
+            }}
+          >
+            Premium User
+          </Box>
+        ) : (
+          <Button
+            variant="contained"
+            onClick={handleSubcription}
+            sx={{
+              backgroundColor: "#f4a825",
+              color: "#fff",
+              fontWeight: 600,
+              borderRadius: 2,
+              textTransform: "none",
+              "&:hover": {
+                backgroundColor: "#e6991a",
+              },
+            }}
+          >
+            Upgrade to Premium
+          </Button>
+        ))}
+
+      {isAuthenticated && (
         <>
           <IconButton onClick={handleOpen} size="small">
             <Avatar
@@ -100,23 +136,6 @@ const Header = () => {
             <MenuItem onClick={handleLogout}>Logout</MenuItem>
           </Menu>
         </>
-      ) : (
-        <Box display="flex" gap={2}>
-          <Button
-            variant="outlined"
-            color="inherit"
-            onClick={() => navigate("/login")}
-          >
-            Sign In
-          </Button>
-          <Button
-            variant="contained"
-            color="secondary"
-            onClick={() => navigate("/register")}
-          >
-            Sign Up
-          </Button>
-        </Box>
       )}
     </header>
   );

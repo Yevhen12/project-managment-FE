@@ -31,7 +31,6 @@ const Sidebar = () => {
     { label: "Sprints", icon: <Activity size={16} />, to: "/sprints" },
     { label: "Team", icon: <Users size={16} />, to: "/team" },
     { label: "Analytics", icon: <BarChart size={16} />, to: "/analytics" },
-    { label: "Settings", icon: <Settings size={16} />, to: "/settings" },
     { label: "Archive", icon: <Archive size={16} />, to: "/archive" },
   ];
 

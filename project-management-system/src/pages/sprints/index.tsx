@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import styles from "./Sprints.module.scss";
 import {
   Button,
@@ -16,114 +16,167 @@ import {
 } from "@hello-pangea/dnd";
 import ActiveProjectLayout from "../../app/layouts";
 import { TaskCard } from "../../components/sprint/taskCard";
-import { mockTasks } from "../../shared/const/fakeData";
-import { statuses } from "../../shared/const/task";
+import { priorities, statuses, taskTypes } from "../../shared/const/task";
 import { CreateSprintModal } from "../../components/modals/CreateSprintModal";
 import { ConfirmEndModal } from "../../components/modals/ConfirmEndSprintModal";
-import { CompleteSprintModal } from "../../components/modals/CompleteSprintModal";
-import { CheckCircleOutline } from "@mui/icons-material";
+import {
+  useGetActiveSprintQuery,
+  useCreateSprintMutation,
+  useFinishSprintMutation,
+} from "../../api/sprintsApi";
+import { useAppSelector } from "../../shared/hooks/useAppSelector";
+import { useGetTeamForProjectQuery } from "../../api/project";
+import { useEditTaskMutation } from "../../api/taskApi";
+import { Task } from "../../shared/types/task";
 
 export const SprintBoardPage = () => {
-  const [tasks, setTasks] = useState(mockTasks);
+  const projectId = useAppSelector(
+    (state) => state.activeProject.activeProject?.id
+  )!;
+
+  const {
+    data: sprint,
+    isLoading,
+    refetch,
+  } = useGetActiveSprintQuery(projectId, {
+    skip: !projectId,
+  });
+
+  const { data: team } = useGetTeamForProjectQuery(projectId);
+  const [createSprint] = useCreateSprintMutation();
+  const [finishSprint] = useFinishSprintMutation();
+  const [editTask] = useEditTaskMutation();
+
+  const [localTasks, setLocalTasks] = useState<Task[]>([]);
+
+  useEffect(() => {
+    // Примусове оновлення тасок
+    const loadFresh = async () => {
+      await refetch(); // чекаємо свіжі дані
+      setIsReady(true); // після них — рендеримо
+    };
+    loadFresh();
+  }, [refetch]);
+
+  useEffect(() => {
+    if (sprint?.tasks) {
+      setLocalTasks(sprint.tasks);
+    }
+  }, [sprint]);
+
   const [searchText, setSearchText] = useState("");
   const [assigneeFilter, setAssigneeFilter] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
   const [priorityFilter, setPriorityFilter] = useState("");
   const [labelFilter, setLabelFilter] = useState("");
 
-  const [activeSprint, setActiveSprint] = useState<any>({
-    name: "Q2 2025 - Sprint 11",
-    startDate: "01/04/2025",
-    endDate: "14/04/2025",
-  });
-
   const [isCreateSprintModalOpen, setCreateSprintModalOpen] = useState(false);
   const [isConfirmEndModalOpen, setConfirmEndModalOpen] = useState(false);
-  const [isCompleteSprintModalOpen, setCompleteSprintModalOpen] =
-    useState(false);
+  const [createAfterFinish, setCreateAfterFinish] = useState(false);
+  const [isReady, setIsReady] = useState(false);
 
-  const [selectedTasks, setSelectedTasks] = useState<string[]>([]);
-
-  const onDragEnd = (result: DropResult) => {
+  const onDragEnd = async (result: DropResult) => {
     const { destination, source, draggableId } = result;
     if (!destination) return;
-    if (
-      destination.droppableId === source.droppableId &&
-      destination.index === source.index
-    )
-      return;
 
-    const updatedTasks = [...tasks];
-    const draggedIndex = updatedTasks.findIndex(
-      (task) => task.id === draggableId
+    // Забороняємо зміну порядку всередині однієї колонки
+    if (destination.droppableId === source.droppableId) return;
+
+    // Локально оновлюємо статус для плавного UI
+    setLocalTasks((prev) =>
+      prev.map((task) =>
+        task.id === draggableId
+          ? { ...task, status: destination.droppableId }
+          : task
+      )
     );
-    const draggedTask = {
-      ...updatedTasks[draggedIndex],
-      status: destination.droppableId,
-    };
-    updatedTasks.splice(draggedIndex, 1);
 
-    const targetTasks = updatedTasks.filter(
-      (t) => t.status === destination.droppableId
-    );
-    const otherTasks = updatedTasks.filter(
-      (t) => t.status !== destination.droppableId
-    );
-    targetTasks.splice(destination.index, 0, draggedTask);
-    setTasks([...otherTasks, ...targetTasks]);
-  };
-
-  const filteredTasks = tasks.filter(
-    (task) =>
-      task.title.toLowerCase().includes(searchText.toLowerCase()) &&
-      (!assigneeFilter || task.assignee === assigneeFilter) &&
-      (!typeFilter || task.type === typeFilter) &&
-      (!priorityFilter || task.priority === priorityFilter) &&
-      (!labelFilter || task.labels?.includes(labelFilter))
-  );
-
-  const handleCreateSprintClick = () => {
-    if (activeSprint) {
-      setConfirmEndModalOpen(true);
-    } else {
-      setCreateSprintModalOpen(true);
+    try {
+      await editTask({
+        taskId: draggableId,
+        body: { status: destination.droppableId },
+      }).unwrap();
+      // ❌ НЕ робимо refetch одразу — порядок може зламатися
+      // Можна зробити відкладений refetch якщо дуже треба:
+      // setTimeout(() => refetch(), 1000);
+    } catch (err) {
+      console.error("Failed to update task status", err);
     }
   };
 
-  const handleSprintCreated = (sprintInfo: {
+  const handleCreateSprint = async ({
+    name,
+    startDate,
+    endDate,
+    taskIds,
+  }: {
     name: string;
     startDate: string;
     endDate: string;
     taskIds: string[];
   }) => {
-    setActiveSprint(sprintInfo);
-    setSelectedTasks(sprintInfo.taskIds);
-    setCreateSprintModalOpen(false);
+    try {
+      await createSprint({
+        body: {
+          name,
+          startDate,
+          endDate,
+          taskIds,
+        },
+        projectId,
+      }).unwrap();
+
+      setCreateSprintModalOpen(false);
+      refetch();
+    } catch (err) {
+      console.error("Failed to create sprint", err);
+    }
   };
 
-  const handleCompleteSprint = () => {
-    setConfirmEndModalOpen(false);
-    setCompleteSprintModalOpen(true);
+  const handleFinishSprint = async () => {
+    if (!sprint?.id) return;
+    try {
+      await finishSprint({ sprintId: sprint.id }).unwrap();
+      setConfirmEndModalOpen(false);
+      setLocalTasks([]); // ❗️Очищаємо таски при завершенні спринта
+      if (createAfterFinish) {
+        setTimeout(() => setCreateSprintModalOpen(true), 0);
+        setCreateAfterFinish(false);
+      }
+      refetch(); // оновлення бекових даних
+    } catch (err) {
+      console.error("Failed to finish sprint", err);
+    }
   };
 
-  const handleCompleteAction = () => {
-    setActiveSprint(null);
-    setCompleteSprintModalOpen(false);
-    setCreateSprintModalOpen(true);
-  };
+  const filteredTasks = useMemo(() => {
+    return localTasks.filter(
+      (task) =>
+        task.title.toLowerCase().includes(searchText.toLowerCase()) &&
+        (!assigneeFilter || task.assignee?.id === assigneeFilter) &&
+        (!typeFilter || task.type === typeFilter) &&
+        (!priorityFilter || task.priority === priorityFilter) &&
+        (!labelFilter || task.labels?.includes(labelFilter))
+    );
+  }, [
+    localTasks,
+    searchText,
+    assigneeFilter,
+    typeFilter,
+    priorityFilter,
+    labelFilter,
+  ]);
 
   return (
     <ActiveProjectLayout>
       <div className={styles.wrapper}>
         <div className={styles.sprintHeader}>
           <div className={styles.sprintInfo}>
-            <h1>{activeSprint?.name || "No Active Sprint"}</h1>
-            {activeSprint && (
+            <h1>{sprint?.name || "No Active Sprint"}</h1>
+            {sprint && (
               <div className={styles.sprintMeta}>
-                <span>2 days remaining</span>
                 <span>
-                  • Start: {activeSprint.startDate} – End:{" "}
-                  {activeSprint.endDate}
+                  • Start: {sprint.startDate} – End: {sprint.endDate}
                 </span>
               </div>
             )}
@@ -136,20 +189,31 @@ export const SprintBoardPage = () => {
                 <Button
                   variant="contained"
                   size="small"
-                  onClick={handleCreateSprintClick}
+                  onClick={() => {
+                    if (sprint) {
+                      setCreateAfterFinish(true);
+                      setConfirmEndModalOpen(true);
+                    } else {
+                      setCreateSprintModalOpen(true);
+                    }
+                  }}
                 >
                   + Create Sprint
                 </Button>
                 <Button
                   variant="outlined"
                   size="small"
+                  disabled={!sprint}
                   sx={{
                     color: "#555",
                     borderColor: "#ccc",
                     fontWeight: 500,
                     "&:hover": { backgroundColor: "#f3f3f3" },
                   }}
-                  onClick={() => setCompleteSprintModalOpen(true)}
+                  onClick={() => {
+                    setCreateAfterFinish(false);
+                    setConfirmEndModalOpen(true);
+                  }}
                 >
                   Finish Sprint
                 </Button>
@@ -174,14 +238,11 @@ export const SprintBoardPage = () => {
                   onChange={(e) => setAssigneeFilter(e.target.value)}
                 >
                   <MenuItem value="">All</MenuItem>
-                  {
-                    //@ts-ignore
-                    [...new Set(tasks.map((t) => t.assignee))].map((a) => (
-                      <MenuItem key={a} value={a}>
-                        {a}
-                      </MenuItem>
-                    ))
-                  }
+                  {team?.map((member) => (
+                    <MenuItem key={member.user.id} value={member.user.id}>
+                      {member.user.firstName} {member.user.lastName}
+                    </MenuItem>
+                  ))}
                 </Select>
               </FormControl>
 
@@ -193,9 +254,11 @@ export const SprintBoardPage = () => {
                   onChange={(e) => setTypeFilter(e.target.value)}
                 >
                   <MenuItem value="">All</MenuItem>
-                  <MenuItem value="bug">🐞 Bug</MenuItem>
-                  <MenuItem value="story">📘 Story</MenuItem>
-                  <MenuItem value="epic">🧩 Epic</MenuItem>
+                  {taskTypes.map((type) => (
+                    <MenuItem key={type.value} value={type.value}>
+                      {type.label}
+                    </MenuItem>
+                  ))}
                 </Select>
               </FormControl>
 
@@ -207,96 +270,71 @@ export const SprintBoardPage = () => {
                   onChange={(e) => setPriorityFilter(e.target.value)}
                 >
                   <MenuItem value="">All</MenuItem>
-                  <MenuItem value="low">Low</MenuItem>
-                  <MenuItem value="medium">Medium</MenuItem>
-                  <MenuItem value="high">High</MenuItem>
-                </Select>
-              </FormControl>
-
-              <FormControl size="small" className={styles.filterSelect}>
-                <InputLabel>Label</InputLabel>
-                <Select
-                  value={labelFilter}
-                  label="Label"
-                  onChange={(e) => setLabelFilter(e.target.value)}
-                >
-                  <MenuItem value="">All</MenuItem>
-                  {
-                    //@ts-ignore
-                    [...new Set(tasks.flatMap((t) => t.labels || []))].map(
-                      (label) => (
-                        <MenuItem key={label} value={label}>
-                          {label}
-                        </MenuItem>
-                      )
-                    )
-                  }
+                  {priorities.map((priority) => (
+                    <MenuItem key={priority.value} value={priority.value}>
+                      {priority.label}
+                    </MenuItem>
+                  ))}
                 </Select>
               </FormControl>
             </div>
           </div>
         </div>
 
-        <DragDropContext onDragEnd={onDragEnd}>
-          <div className={styles.board}>
-            {statuses.map((status) => (
-              <Droppable droppableId={status.value} key={status.value}>
-                {(provided) => (
-                  <div
-                    className={styles.column}
-                    ref={provided.innerRef}
-                    {...provided.droppableProps}
-                  >
-                    <div className={styles.columnHeader}>{status.label}</div>
-                    <div className={styles.tasksArea}>
-                      {filteredTasks
-                        .filter((task) => task.status === status.value)
-                        .map((task, index) => (
-                          <Draggable
-                            key={task.id}
-                            draggableId={task.id}
-                            index={index}
-                          >
-                            {(provided) => (
-                              <div
-                                className={styles.taskCardWrapper}
-                                ref={provided.innerRef}
-                                {...provided.draggableProps}
-                                {...provided.dragHandleProps}
-                              >
-                                <TaskCard task={task} />
-                              </div>
-                            )}
-                          </Draggable>
-                        ))}
-                      {provided.placeholder}
+        {isReady && (
+          <DragDropContext onDragEnd={onDragEnd}>
+            <div className={styles.board}>
+              {statuses.map((status) => (
+                <Droppable droppableId={status.value} key={status.value}>
+                  {(provided) => (
+                    <div
+                      className={styles.column}
+                      ref={provided.innerRef}
+                      {...provided.droppableProps}
+                    >
+                      <div className={styles.columnHeader}>{status.label}</div>
+                      <div className={styles.tasksArea}>
+                        {filteredTasks
+                          .filter((task) => task.status === status.value)
+                          .map((task, index) => (
+                            <Draggable
+                              key={task.id}
+                              draggableId={task.id}
+                              index={index}
+                            >
+                              {(provided) => (
+                                <div
+                                  className={styles.taskCardWrapper}
+                                  ref={provided.innerRef}
+                                  {...provided.draggableProps}
+                                  {...provided.dragHandleProps}
+                                >
+                                  <TaskCard task={task} />
+                                </div>
+                              )}
+                            </Draggable>
+                          ))}
+                        {provided.placeholder}
+                      </div>
                     </div>
-                  </div>
-                )}
-              </Droppable>
-            ))}
-          </div>
-        </DragDropContext>
+                  )}
+                </Droppable>
+              ))}
+            </div>
+          </DragDropContext>
+        )}
       </div>
 
       <CreateSprintModal
         open={isCreateSprintModalOpen}
         onClose={() => setCreateSprintModalOpen(false)}
-        onCreate={handleSprintCreated}
-        tasks={tasks}
+        onCreate={handleCreateSprint}
       />
 
       <ConfirmEndModal
         open={isConfirmEndModalOpen}
         onCancel={() => setConfirmEndModalOpen(false)}
-        onConfirm={handleCompleteSprint}
-      />
-
-      <CompleteSprintModal
-        open={isCompleteSprintModalOpen}
-        onClose={() => setCompleteSprintModalOpen(false)}
-        onMoveToBacklog={handleCompleteAction}
-        onMoveToNextSprint={handleCompleteAction}
+        onConfirm={handleFinishSprint}
       />
     </ActiveProjectLayout>
   );

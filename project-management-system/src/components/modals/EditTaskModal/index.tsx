@@ -13,7 +13,7 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { taskTypes, priorities, statuses } from "../../../shared/const/task";
 import { useGetTeamForProjectQuery } from "../../../api/project";
-// import { useGetProjectSprintsQuery } from "@/api/sprintApi";
+import { useGetProjectSprintsQuery } from "../../../api/sprintsApi";
 import { useAppSelector } from "../../../shared/hooks/useAppSelector";
 import { ACTIVE_PROJECT_ID } from "../../../shared/const/localStorage";
 import { Task } from "../../../shared/types/task";
@@ -57,8 +57,9 @@ const EditTaskModal = ({ task, onClose, onSave }: EditTaskModalProps) => {
     skip: !projectId,
   });
 
-  // const { data: sprints = [] } = useGetProjectSprintsQuery(projectId!, { skip: !projectId });
-  const sprints: any[] = [];
+  const { data: sprints = [] } = useGetProjectSprintsQuery(projectId!, {
+    skip: !projectId,
+  });
 
   const estimateInMinutes = Number(task.estimate ?? 0);
   const estimateDays = Math.floor(estimateInMinutes / 1440);
@@ -193,11 +194,14 @@ const EditTaskModal = ({ task, onClose, onSave }: EditTaskModalProps) => {
             fullWidth
           >
             <MenuItem value="">No Sprint</MenuItem>
-            {sprints.map((s) => (
-              <MenuItem key={s.id} value={s.id}>
-                {s.name}
-              </MenuItem>
-            ))}
+            {
+              //@ts-ignore
+              sprints.map((s: any) => (
+                <MenuItem key={s.id} value={s.id}>
+                  {s.name}
+                </MenuItem>
+              ))
+            }
           </TextField>
 
           <TextField
