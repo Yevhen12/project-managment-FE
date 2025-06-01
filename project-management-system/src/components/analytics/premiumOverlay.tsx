@@ -30,10 +30,10 @@ const PremiumOverlay = () => {
       }}
     >
       <Typography variant="h6" fontWeight={600} mb={1}>
-        Доступ до преміум-аналітики обмежений
+        Premium analytics access is restricted
       </Typography>
       <Typography variant="body2" mb={2}>
-        Оформіть підписку, щоб переглядати візуальну аналітику
+        Subscribe to unlock detailed project insights and visual charts.
       </Typography>
       <Button variant="contained" color="primary" onClick={handleRedirect}>
         Upgrade to Premium

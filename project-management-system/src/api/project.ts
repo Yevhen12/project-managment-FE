@@ -110,6 +110,7 @@ export const {
   useGetUserProjectsQuery,
   useCreateProjectMutation,
   useLazyGetProjectQuery,
+  useGetProjectQuery,
   useGetTeamForProjectQuery,
   useSendInviteMutation,
   useDeclineInviteMutation,

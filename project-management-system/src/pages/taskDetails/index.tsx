@@ -18,7 +18,7 @@ import {
   useGetTaskByIdQuery,
   useEditTaskMutation,
   useDeleteTaskMutation,
-  useAddAttachmentMutation, // 👈 додаємо хук
+  useAddAttachmentMutation,
 } from "../../api/taskApi";
 
 const TaskDetailsPage = () => {
@@ -34,7 +34,7 @@ const TaskDetailsPage = () => {
   });
 
   const [editTask] = useEditTaskMutation();
-  const [deleteTask] = useDeleteTaskMutation(); // 👈 викликаємо хук
+  const [deleteTask] = useDeleteTaskMutation(); 
   const [addAttachment] = useAddAttachmentMutation();
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -63,8 +63,8 @@ const TaskDetailsPage = () => {
 
   const handleDeleteConfirm = async () => {
     try {
-      await deleteTask(task.id).unwrap(); // 👈 видаляємо
-      navigate("/tasks"); // ✅ редірект після успіху
+      await deleteTask(task.id).unwrap();
+      navigate("/tasks"); 
     } catch (err) {
       console.error("Failed to delete task", err);
     } finally {

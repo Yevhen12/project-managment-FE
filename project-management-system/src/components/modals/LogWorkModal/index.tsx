@@ -30,7 +30,7 @@ export const LogWorkModal = ({ open, onClose, onSave }: LogWorkModalProps) => {
 
   useEffect(() => {
     if (open) {
-      const today = new Date().toISOString().split("T")[0]; // формат yyyy-mm-dd
+      const today = new Date().toISOString().split("T")[0];
       setDate(today);
     }
   }, [open]);

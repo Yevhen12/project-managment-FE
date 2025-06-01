@@ -22,7 +22,7 @@ export const AttachmentPreview = ({ id, name, url, onDelete }: AttachmentProps) 
   };
 
   const handleDelete = (e: React.MouseEvent) => {
-    e.stopPropagation(); // не відкривати зображення при натисканні на іконку
+    e.stopPropagation(); 
     onDelete(id);
   };
 

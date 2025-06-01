@@ -5,7 +5,7 @@ import { Task } from "../shared/types/task";
 export const taskApi = createApi({
   reducerPath: "taskApi",
   baseQuery: baseQueryWithReauth,
-  tagTypes: ["Task"], // ✅ Єдиний правильний тег
+  tagTypes: ["Task"],
   endpoints: (builder) => ({
     getTasksForProject: builder.query<Task[], string>({
       query: (projectId) => ({
@@ -21,7 +21,6 @@ export const taskApi = createApi({
             ]
           : [{ type: "Task", id: "LIST" }],
     }),
-
     createTask: builder.mutation<void, any>({
       query: (body) => ({
         url: "/projects/tasks",
@@ -30,7 +29,6 @@ export const taskApi = createApi({
       }),
       invalidatesTags: [{ type: "Task", id: "LIST" }],
     }),
-
     getTaskById: builder.query<Task, string>({
       query: (id) => `/projects/tasks/${id}`,
       transformResponse: (res: any) => res.data,

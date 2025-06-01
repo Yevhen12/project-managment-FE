@@ -40,7 +40,7 @@ interface AddMemberModalProps {
   open: boolean;
   onClose: () => void;
   onAdd: () => void;
-  existingMembers: ProjectMember[]; // used to filter out already added
+  existingMembers: ProjectMember[];
 }
 
 const AddMemberModal = ({ open, onClose, onAdd, existingMembers }: AddMemberModalProps) => {
@@ -93,7 +93,6 @@ const AddMemberModal = ({ open, onClose, onAdd, existingMembers }: AddMemberModa
       onAdd();
       resetForm();
     } catch (_) {
-      // handled via error
     }
   };
 

@@ -36,7 +36,7 @@ const LoginPage = () => {
     onSubmit: async (values) => {
       try {
         await login(values).unwrap();
-        navigate(RoutePath.select_project); // після логіну перекидаємо на вибір проєкту
+        navigate(RoutePath.select_project); 
       } catch (e) {
         console.log("error", e);
       }

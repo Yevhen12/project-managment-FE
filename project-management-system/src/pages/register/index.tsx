@@ -54,8 +54,8 @@ const RegisterPage = () => {
           password: values.password,
         }).unwrap();
 
-        formik.resetForm(); // очищення форми
-        navigate(RoutePath.select_project); // правильний редірект
+        formik.resetForm();
+        navigate(RoutePath.select_project); 
       } catch (e) {
         console.log("error", e);
       }

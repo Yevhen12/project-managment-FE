@@ -50,7 +50,6 @@ const SelectProjectPage = () => {
   );
 
   const handleSelect = (project: Project) => {
-    // ✅ зберігаємо лише id
     localStorage.setItem(ACTIVE_PROJECT_ID, project.id);
     dispatch(setActiveProject(project));
     navigate("/dashboard");
@@ -62,7 +61,6 @@ const SelectProjectPage = () => {
       setModalOpen(false);
       handleSelect(res);
     } catch (err) {
-      // handled below
     }
   };
 

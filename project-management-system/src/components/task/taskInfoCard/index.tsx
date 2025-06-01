@@ -47,7 +47,7 @@ export const TaskInfoCard: FC<TaskInfoCardProps> = ({
         comment: data.comment,
       }).unwrap();
 
-      await refetch(); // 🔁 оновлення task
+      await refetch();
       handleCloseLogWorkModal();
     } catch (err) {
       console.error("Log work failed:", err);

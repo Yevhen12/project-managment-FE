@@ -1,5 +1,3 @@
-
-
 .title {
   font-size: 24px;
   font-weight: 600;
@@ -9,14 +7,9 @@
   margin-bottom: 20px;
 }
 
-.subtitle {
-  color: #6b7280;
-  margin-bottom: 1rem;
-}
-
 .grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(6, 1fr);
   gap: 1rem;
 }
 
@@ -29,32 +22,29 @@
   flex-direction: column;
 }
 
-.wide {
+.third {
   grid-column: span 2;
 }
 
-.wideGraph {
+.half {
   grid-column: span 3;
 }
 
-.progressBar {
-  background: #e5e7eb;
-  border-radius: 6px;
-  height: 8px;
-  margin-top: 4px;
-
-  .progress {
-    height: 100%;
-    background: #3b82f6;
-    border-radius: 6px;
-  }
+.full {
+  grid-column: span 6;
 }
 
-.tasks li,
-.deadlines li {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 0.5rem;
+.viewAll {
+  font-size: 12px;
+  margin-top: 0.5rem;
+  color: #3b82f6;
+  align-self: flex-end;
+  cursor: pointer;
+}
+
+.links li {
+  padding: 4px 0;
+  font-weight: 500;
 }
 
 .status {
@@ -82,15 +72,10 @@
   color: #6b7280;
 }
 
-.links li {
-  padding: 4px 0;
-  font-weight: 500;
+.half {
+  grid-column: span 3;
 }
 
-.viewAll {
-  font-size: 12px;
-  margin-top: 0.5rem;
-  color: #3b82f6;
-  align-self: flex-end;
-  cursor: pointer;
+.innerWrapper {
+  padding: 0 1.5rem; // або 24px
 }

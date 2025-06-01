@@ -16,7 +16,6 @@ const AppRoutes = () => {
   const [getProject] = useLazyGetProjectQuery();
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const state = useAppSelector((state) => state);
-  console.log({ state });
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
@@ -33,7 +32,6 @@ const AppRoutes = () => {
               const project = await getProject(storedProjectId).unwrap();
               dispatch(setActiveProject(project));
             } catch (e) {
-              console.warn("❌ Failed to fetch active project", e);
               localStorage.removeItem(ACTIVE_PROJECT_ID);
             }
           }

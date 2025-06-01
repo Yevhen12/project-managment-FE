@@ -19,7 +19,7 @@ const TaskDetails = ({ task, handleAddAttachment }: TaskDetailsProps) => {
   const handleDeleteAttachment = async (attachmentId: string) => {
     try {
       await deleteAttachment(attachmentId).unwrap();
-      await refetch(); // 🔁 оновити task після видалення
+      await refetch();
     } catch (err) {
       console.error("Failed to delete attachment", err);
     }

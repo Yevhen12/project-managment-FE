@@ -28,6 +28,7 @@ import { useAppSelector } from "../../shared/hooks/useAppSelector";
 import { useGetTeamForProjectQuery } from "../../api/project";
 import { useEditTaskMutation } from "../../api/taskApi";
 import { Task } from "../../shared/types/task";
+import { ProjectRole } from "../../shared/types/project";
 
 export const SprintBoardPage = () => {
   const projectId = useAppSelector(
@@ -48,12 +49,12 @@ export const SprintBoardPage = () => {
   const [editTask] = useEditTaskMutation();
 
   const [localTasks, setLocalTasks] = useState<Task[]>([]);
+  const userRole = useAppSelector((state) => state.activeProject.activeProject?.myRole);
 
   useEffect(() => {
-    // Примусове оновлення тасок
     const loadFresh = async () => {
-      await refetch(); // чекаємо свіжі дані
-      setIsReady(true); // після них — рендеримо
+      await refetch(); 
+      setIsReady(true); 
     };
     loadFresh();
   }, [refetch]);
@@ -79,10 +80,8 @@ export const SprintBoardPage = () => {
     const { destination, source, draggableId } = result;
     if (!destination) return;
 
-    // Забороняємо зміну порядку всередині однієї колонки
     if (destination.droppableId === source.droppableId) return;
 
-    // Локально оновлюємо статус для плавного UI
     setLocalTasks((prev) =>
       prev.map((task) =>
         task.id === draggableId
@@ -96,9 +95,6 @@ export const SprintBoardPage = () => {
         taskId: draggableId,
         body: { status: destination.droppableId },
       }).unwrap();
-      // ❌ НЕ робимо refetch одразу — порядок може зламатися
-      // Можна зробити відкладений refetch якщо дуже треба:
-      // setTimeout(() => refetch(), 1000);
     } catch (err) {
       console.error("Failed to update task status", err);
     }
@@ -138,12 +134,12 @@ export const SprintBoardPage = () => {
     try {
       await finishSprint({ sprintId: sprint.id }).unwrap();
       setConfirmEndModalOpen(false);
-      setLocalTasks([]); // ❗️Очищаємо таски при завершенні спринта
+      setLocalTasks([]); 
       if (createAfterFinish) {
         setTimeout(() => setCreateSprintModalOpen(true), 0);
         setCreateAfterFinish(false);
       }
-      refetch(); // оновлення бекових даних
+      refetch();
     } catch (err) {
       console.error("Failed to finish sprint", err);
     }
@@ -185,39 +181,41 @@ export const SprintBoardPage = () => {
           <div className={styles.filtersWrapper}>
             <div className={styles.actionsRow}>
               <div />
-              <div className={styles.actions}>
-                <Button
-                  variant="contained"
-                  size="small"
-                  onClick={() => {
-                    if (sprint) {
-                      setCreateAfterFinish(true);
+              {userRole === ProjectRole.ADMIN && (
+                <div className={styles.actions}>
+                  <Button
+                    variant="contained"
+                    size="small"
+                    onClick={() => {
+                      if (sprint) {
+                        setCreateAfterFinish(true);
+                        setConfirmEndModalOpen(true);
+                      } else {
+                        setCreateSprintModalOpen(true);
+                      }
+                    }}
+                  >
+                    + Create Sprint
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    disabled={!sprint}
+                    sx={{
+                      color: "#555",
+                      borderColor: "#ccc",
+                      fontWeight: 500,
+                      "&:hover": { backgroundColor: "#f3f3f3" },
+                    }}
+                    onClick={() => {
+                      setCreateAfterFinish(false);
                       setConfirmEndModalOpen(true);
-                    } else {
-                      setCreateSprintModalOpen(true);
-                    }
-                  }}
-                >
-                  + Create Sprint
-                </Button>
-                <Button
-                  variant="outlined"
-                  size="small"
-                  disabled={!sprint}
-                  sx={{
-                    color: "#555",
-                    borderColor: "#ccc",
-                    fontWeight: 500,
-                    "&:hover": { backgroundColor: "#f3f3f3" },
-                  }}
-                  onClick={() => {
-                    setCreateAfterFinish(false);
-                    setConfirmEndModalOpen(true);
-                  }}
-                >
-                  Finish Sprint
-                </Button>
-              </div>
+                    }}
+                  >
+                    Finish Sprint
+                  </Button>
+                </div>
+              )}
             </div>
 
             <div className={styles.filters}>

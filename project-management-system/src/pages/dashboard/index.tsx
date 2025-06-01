@@ -1,108 +1,144 @@
-import React from 'react';
-import ActiveProjectLayout from '../../app/layouts';
-import styles from './DashboardPage.module.scss';
-import cardStyles from './DashboardCards.module.scss';
-import { TaskCardItem } from './components/TaskCardItem';
-import { DeadlineItem } from './components/DeadlineItem';
-import { ProjectActivityChart } from './components/ProjectActivityChart';
-import { Link } from 'react-router-dom';
+import React from "react";
+import ActiveProjectLayout from "../../app/layouts";
+import styles from "./DashboardPage.module.scss";
+import { TaskCardItem } from "./components/TaskCardItem";
+import { Link } from "react-router-dom";
+import TaskStatusChart from "./components/TaskStatusChart";
+import AssignedTaskTypesChart from "./components/AssignedTaskTypesChart";
+import PremiumOverlay from "../../components/analytics/premiumOverlay";
+import { useAppSelector } from "../../shared/hooks/useAppSelector";
+import {
+  useGetProjectQuery,
+  useGetTeamForProjectQuery,
+} from "../../api/project";
+import { useGetActiveSprintQuery } from "../../api/sprintsApi";
+import { useGetTasksForProjectQuery } from "../../api/taskApi";
 
 const DashboardPage = () => {
-  const project = {};
+  const isPremium = useAppSelector((state) => state.auth.user?.isPremium);
+  const projectId = useAppSelector(
+    (state) => state.activeProject.activeProject?.id
+  );
 
-  const tasks = [
-    {
-      id: 1,
-      title: 'Fix header bug',
-      status: 'In Progress',
-      priority: 'High',
-      sprint: 'Sprint 3',
-    },
-    {
-      id: 2,
-      title: 'Design login screen',
-      status: 'To Do',
-      priority: 'Medium',
-      sprint: 'Sprint 3',
-    },
-    {
-      id: 3,
-      title: 'Code review: Sprint 3',
-      status: 'Done',
-      priority: 'Low',
-      sprint: 'Sprint 3',
-    },
-  ];
+  const { data: project } = useGetProjectQuery(projectId!, {
+    skip: !projectId,
+  });
+  const { data: activeSprint } = useGetActiveSprintQuery(projectId!, {
+    skip: !projectId,
+  });
+  const { data: tasks = [] } = useGetTasksForProjectQuery(projectId!, {
+    skip: !projectId,
+  });
+  const { data: team = [] } = useGetTeamForProjectQuery(projectId!, {
+    skip: !projectId,
+  });
 
-  const deadlines = [
-    { id: 1, title: 'Fix payment gateway', dueDate: 'Wed Apr 23 2025' },
-    { id: 2, title: 'Sprint Review Meeting', dueDate: 'Thu Apr 24 2025' },
-    { id: 3, title: 'Prepare presentation', dueDate: 'Fri Apr 25 2025' },
-  ];
+  const statusSummary = tasks.reduce((acc: Record<string, number>, task) => {
+    const key = task.status || "Other";
+    acc[key] = acc[key] ? acc[key] + 1 : 1;
+    return acc;
+  }, {});
+
+  const typeSummary = tasks.reduce((acc: Record<string, number>, task) => {
+    const key = task.type || "Other";
+    acc[key] = acc[key] ? acc[key] + 1 : 1;
+    return acc;
+  }, {});
+
+  const renderWithOverlay = (content: React.ReactNode) => (
+    <div style={{ position: "relative" }}>
+      <div
+        style={{
+          filter: isPremium ? "none" : "blur(4px)",
+          pointerEvents: isPremium ? "auto" : "none",
+          transition: "0.3s ease",
+        }}
+      >
+        {content}
+      </div>
+      {!isPremium && (
+        <div className={styles.overlay}>
+          <PremiumOverlay />
+        </div>
+      )}
+    </div>
+  );
 
   return (
     <ActiveProjectLayout classname={styles.dashboard}>
-      <h2 className={styles.heading}>test</h2>
-      <p className={styles.subheading}>Test</p>
+      <div className={styles.innerWrapper}>
+        <h2 className={styles.title}>{project?.name || "Project"}</h2>
+        <p className={styles.subheading}>
+          {project?.description || "No description"}
+        </p>
 
-      <div className={styles.grid}>
-        <div className={styles.card}>
-          <h3>Project Overview</h3>
-          <p>Test</p>
-        </div>
+        <div className={styles.grid}>
+          <div className={`${styles.card} ${styles.third}`}>
+            <h3>Project Overview</h3>
+            <p>{project?.name || "No name"}</p>
+          </div>
 
-        <div className={styles.card}>
-          <h3>Team Members</h3>
-          <p>3 total</p>
-          <p>+ Maria, Oleh, Anastasia</p>
-        </div>
+          <div className={`${styles.card} ${styles.third}`}>
+            <h3>Team Members</h3>
+            <p>{team.length} total</p>
+            <p>
+              {team
+                .map((member: any) => member.user?.firstName)
+                .filter(Boolean)
+                .slice(0, 3)
+                .join(", ") || "-"}
+            </p>
+          </div>
 
-        <div className={styles.card}>
-          <h3>Current Sprint</h3>
-          <p>No active sprint</p>
-        </div>
+          <div className={`${styles.card} ${styles.third}`}>
+            <h3>Current Sprint</h3>
+            <p>{activeSprint?.name || "No active sprint"}</p>
+          </div>
 
-        <div className={styles.card}>
-          <h3>Project Progress</h3>
-          <p>61% complete</p>
-          <progress value="61" max="100" />
-        </div>
+          <div className={`${styles.card} ${styles.half}`}>
+            <h3>Task Status Overview</h3>
+            {renderWithOverlay(<TaskStatusChart data={statusSummary} />)}
+          </div>
 
-        <div className={`${styles.card} ${styles.wide}`}>
-          <h3>Upcoming Deadlines</h3>
-          {deadlines.map(dl => (
-            <DeadlineItem key={dl.id} title={dl.title} dueDate={dl.dueDate} />
-          ))}
-        </div>
+          <div className={`${styles.card} ${styles.half}`}>
+            <h3>Assigned Task Types</h3>
+            {renderWithOverlay(<AssignedTaskTypesChart data={typeSummary} />)}
+          </div>
 
-        <div className={`${styles.card} ${styles.wide}`}>
-          <h3>My Tasks</h3>
-          {tasks.map(task => (
-            <TaskCardItem
-              key={task.id}
-              title={task.title}
-              //@ts-ignore
-              status={task.status}
-              //@ts-ignore
-              priority={task.priority}
-              sprint={task.sprint}
-            />
-          ))}
-          <div className={styles.viewAll}><Link to="/tasks">View All</Link></div>
-        </div>
+          <div className={`${styles.card} ${styles.half}`}>
+            <h3>Tasks</h3>
+            {tasks.slice(0, 3).map((task) =>
+              task?.title ? (
+                <TaskCardItem
+                  key={task.id}
+                  title={task.title}
+                  //@ts-ignore
+                  status={task.status}
+                  //@ts-ignore
+                  priority={task.priority}
+                  sprint={task.sprint?.name || "No Sprint"}
+                />
+              ) : null
+            )}
+            <div className={styles.viewAll}>
+              <Link to="/tasks">View All</Link>
+            </div>
+          </div>
 
-        <div className={`${styles.card} ${styles.wideGraph}`}>
-          <h3>Project Activity</h3>
-          <ProjectActivityChart />
-        </div>
-
-        <div className={styles.card}>
-          <h3>Quick Links</h3>
-          <ul className={styles.links}>
-            <li><Link to="/tasks">🗂 Tasks</Link></li>
-            <li><Link to="/sprints">🚀 Sprints</Link></li>
-            <li><Link to="/settings">⚙️ Settings</Link></li>
-          </ul>
+          <div className={`${styles.card} ${styles.half}`}>
+            <h3>Quick Links</h3>
+            <ul className={styles.links}>
+              <li>
+                <Link to="/tasks">🗂 Tasks</Link>
+              </li>
+              <li>
+                <Link to="/sprints">🚀 Sprints</Link>
+              </li>
+              <li>
+                <Link to="/settings">⚙️ Settings</Link>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </ActiveProjectLayout>
